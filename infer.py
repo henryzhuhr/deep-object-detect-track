@@ -1,0 +1,62 @@
+import argparse
+import cv2
+import numpy as np
+import yaml
+
+from dlinfer import Backends, Process
+
+
+def parse_args() -> argparse.Namespace:
+    """Parse and return command line arguments."""
+    parser = argparse.ArgumentParser(add_help=False)
+    args = parser.add_argument_group("Options")
+    args.add_argument(
+        "-m",
+        "--model",
+        type=str,
+        default="resource/weights/yolov5s.onnx",
+        help="Required. Path to an .xml or .onnx file with a trained model.",
+    )
+    args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
+    args.add_argument(
+        "-d",
+        "--device",
+        type=str,
+        default="CPU",
+        help="Optional. Specify the target device to infer on; CPU, GPU, GNA or HETERO: "
+        "is acceptable. The sample will look for a suitable plugin for device specified. "
+        "Default value is CPU.",
+    )
+    # fmt: on
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    try:
+        backends = Backends()
+        backend = backends.OpenVINOBackend(device=args.device)
+    except RuntimeError as e:
+        print(e)
+        return 1
+    backend.load_model(args.model)
+
+    with open("resource/yolov5s.yaml", "r") as f:
+        label_map = yaml.load(f, Loader=yaml.FullLoader)["names"]
+        label_list = list(label_map.values())
+        print(label_list)
+
+    img = cv2.imread(args.input)  # H W C
+
+    # -- do inference
+    input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
+    output_t = backend.infer(input_t)
+    preds = Process.postprocess(output_t)
+
+    # -- mark
+    Process.mark(img, preds, label_list, scale_h, scale_w)
+    cv2.imwrite("out.jpg", img)
+
+
+if __name__ == "__main__":
+    main()
