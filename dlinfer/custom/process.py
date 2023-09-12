@@ -18,6 +18,9 @@ class Process:
     @staticmethod
     def postprocess(preds: np.ndarray, conf_thres=0.25, iou_thres=0.45) -> np.ndarray:
         preds = non_max_suppression(preds, conf_thres, iou_thres)[0]
+        # print(preds.shape)
+        # preds=cv2.dnn.NMSBoxesBatched(preds[:, :4], preds[:, 4], conf_thres, iou_thres)
+        # exit()
         return preds
 
     @staticmethod

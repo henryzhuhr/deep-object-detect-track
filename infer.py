@@ -1,9 +1,10 @@
 import argparse
+from typing import Dict
 import cv2
 import numpy as np
 import yaml
 
-from dlinfer import Backends, Process
+from dlinfer import InferBackends, Process
 
 
 def parse_args() -> argparse.Namespace:
@@ -14,7 +15,7 @@ def parse_args() -> argparse.Namespace:
         "-m",
         "--model",
         type=str,
-        default="resource/weights/yolov5s.onnx",
+        default="resource/weights/yolov5s.engine",
         help="Required. Path to an .xml or .onnx file with a trained model.",
     )
     args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
@@ -27,30 +28,35 @@ def parse_args() -> argparse.Namespace:
         "is acceptable. The sample will look for a suitable plugin for device specified. "
         "Default value is CPU.",
     )
-    # fmt: on
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     try:
-        backends = Backends()
-        backend = backends.OpenVINOBackend(device=args.device)
+        backends = InferBackends()
+        backend = backends.TensorRTBackend(device=args.device)
     except RuntimeError as e:
         print(e)
         return 1
-    backend.load_model(args.model)
+    backend.load_model(args.model, verbose=True)
+    
 
     with open("resource/yolov5s.yaml", "r") as f:
-        label_map = yaml.load(f, Loader=yaml.FullLoader)["names"]
+        label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)["names"]
         label_list = list(label_map.values())
-        print(label_list)
+        # print(label_list)
 
     img = cv2.imread(args.input)  # H W C
 
     # -- do inference
+    start_time = cv2.getTickCount()
     input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
     output_t = backend.infer(input_t)
+
+    end_time = cv2.getTickCount()
+    print("Inference time: ", (end_time - start_time) / cv2.getTickFrequency() * 1000, "ms")
+
     preds = Process.postprocess(output_t)
 
     # -- mark

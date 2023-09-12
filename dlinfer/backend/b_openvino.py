@@ -3,6 +3,7 @@ from .interface import IBackend
 import numpy as np
 from openvino.preprocess import PrePostProcessor
 from openvino.runtime import (
+    __version__,
     AsyncInferQueue,
     Core,
     CompiledModel,
@@ -14,20 +15,22 @@ from openvino.runtime import (
 
 
 class OpenVINOBackend(IBackend):
+    NAME = "OpenVINO"
+    SUPPORTED_VERISONS = ["2023.0.1"]
+    SUPPORTED_DEVICES = ["CPU", "GPU", "MYRIAD", "HDDL", "HETERO"]
+
     def __init__(self, device) -> None:
+        ov_version: str = __version__
+        super().__init__(ov_version)
         self.core: Core = Core()
         self.device = device
         self.model: CompiledModel = None
 
-    def load_model(self, model_path: str) -> None:
+    def load_model(self, model_path: str, verbose: bool = False) -> None:
         try:
             model: Model = self.core.read_model(model_path)
-            assert (
-                len(model.inputs) == 1
-            ), "Sample supports only single input topologies"
-            assert (
-                len(model.outputs) == 1
-            ), "Sample supports only single output topologies"
+            assert len(model.inputs) == 1, "Sample supports only single input topologies"
+            assert len(model.outputs) == 1, "Sample supports only single output topologies"
 
             # -- Apply preprocessing
             ppp = PrePostProcessor(model)

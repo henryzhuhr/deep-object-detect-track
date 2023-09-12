@@ -1,2 +1,2 @@
-from .backend.backend import Backends
-from .process import Process
+from .backend import InferBackends
+from .custom import Process

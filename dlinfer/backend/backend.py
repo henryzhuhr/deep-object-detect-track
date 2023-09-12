@@ -1,7 +1,7 @@
 from dlinfer.backend.interface import IBackend
 
 
-class Backends:
+class InferBackends:
     def __init__(self) -> None:
         try:
             from .b_onnx import ONNXBackend
@@ -14,3 +14,9 @@ class Backends:
         except ImportError:
             OpenVINOBackend = None
         self.OpenVINOBackend= OpenVINOBackend
+
+        try:
+            from .b_tensorrt import TensorRTBackend
+        except ImportError:
+            TensorRTBackend = None
+        self.TensorRTBackend = TensorRTBackend
