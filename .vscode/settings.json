@@ -1,0 +1,17 @@
+{
+    "clangd.arguments": [
+        "--background-index",
+        "--compile-commands-dir=build",
+        "-j=10",
+        "--query-driver=/usr/bin/clang++",
+        "--clang-tidy",
+        "--clang-tidy-checks=performance-*,bugprone-*",
+        "--all-scopes-completion",
+        "--completion-style=detailed",
+        "--header-insertion=iwyu",
+        "--pch-storage=disk"
+    ],
+    "clangd.fallbackFlags": [
+        "-l/home/zhr/program/openvino/runtime/include"
+    ]
+}
