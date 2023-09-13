@@ -1,3 +1,7 @@
+tmp/
+tmps/
+temp/
+temps/
 resource/
 
 *.code-workspace

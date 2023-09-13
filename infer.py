@@ -1,4 +1,5 @@
 import argparse
+import os
 from typing import Dict
 import cv2
 import numpy as np
@@ -15,7 +16,7 @@ def parse_args() -> argparse.Namespace:
         "-m",
         "--model",
         type=str,
-        default="resource/weights/yolov5s.engine",
+        default="resource/weights/yolov5s.onnx",
         help="Required. Path to an .xml or .onnx file with a trained model.",
     )
     args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
@@ -23,7 +24,7 @@ def parse_args() -> argparse.Namespace:
         "-d",
         "--device",
         type=str,
-        default="CPU",
+        default="CPUExecutionProvider",
         help="Optional. Specify the target device to infer on; CPU, GPU, GNA or HETERO: "
         "is acceptable. The sample will look for a suitable plugin for device specified. "
         "Default value is CPU.",
@@ -35,12 +36,11 @@ def main() -> int:
     args = parse_args()
     try:
         backends = InferBackends()
-        backend = backends.TensorRTBackend(device=args.device)
+        backend = backends.ONNXBackend(device=args.device)
     except RuntimeError as e:
         print(e)
         return 1
     backend.load_model(args.model, verbose=True)
-    
 
     with open("resource/yolov5s.yaml", "r") as f:
         label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)["names"]
@@ -48,6 +48,7 @@ def main() -> int:
         # print(label_list)
 
     img = cv2.imread(args.input)  # H W C
+    os.makedirs("tmp", exist_ok=True)
 
     # -- do inference
     start_time = cv2.getTickCount()
@@ -61,7 +62,7 @@ def main() -> int:
 
     # -- mark
     Process.mark(img, preds, label_list, scale_h, scale_w)
-    cv2.imwrite("out.jpg", img)
+    cv2.imwrite("tmp/out.jpg", img)
 
 
 if __name__ == "__main__":
