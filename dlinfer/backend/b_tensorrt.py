@@ -1,20 +1,81 @@
 from typing import List
 import numpy as np
 from .interface import IBackend
+
 import tensorrt as trt
 
-print(trt.__version__)
+support_trt_version = {
+    "8.6": "8.6",
+}
 
+if trt.__version__ >= support_trt_version["8.6"]:
+    from cuda import cuda, cudart  # cuda-python
 
-# cuda-python for tensorrt >= 8.0
+    class CUDA_Utils:
+        @staticmethod
+        def memcpy_host_to_device(device_ptr: int, host_arr: np.ndarray):
+            # Wrapper for cudaMemcpy which infers copy size and does error checking
+            nbytes = host_arr.size * host_arr.itemsize
+            cudart.cudaMemcpy(
+                device_ptr, host_arr, nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice
+            )
 
-from cuda import cuda, cudart
+        @staticmethod
+        def memcpy_device_to_host(outputs_bindings: List[dict]):
+            # Wrapper for cudaMemcpy which infers copy size and does error checking
+            for o in range(len(outputs_bindings)):
+                host_arr: np.ndarray = outputs_bindings[o]["host_allocation"]
+                device_ptr: int = outputs_bindings[o]["allocation"]
+                nbytes = host_arr.size * host_arr.itemsize
+                cudart.cudaMemcpy(
+                    host_arr, device_ptr, nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost
+                )
+            outputs: List[np.ndarray] = [o["host_allocation"] for o in outputs_bindings]
+            return outputs
+
+        @staticmethod
+        def cuda_call(call):
+            def check_cuda_err(err):
+                if isinstance(err, cuda.CUresult):
+                    if err != cuda.CUresult.CUDA_SUCCESS:
+                        raise RuntimeError("Cuda Error: {}".format(err))
+                if isinstance(err, cudart.cudaError_t):
+                    if err != cudart.cudaError_t.cudaSuccess:
+                        raise RuntimeError("Cuda Runtime Error: {}".format(err))
+                else:
+                    raise RuntimeError("Unknown error type: {}".format(err))
+
+            err, res = call[0], call[1:]
+            check_cuda_err(err)
+            if len(res) == 1:
+                res = res[0]
+            return res
+
+        @staticmethod
+        def get_allocation(size):
+            return CUDA_Utils.cuda_call(cudart.cudaMalloc(size))
+
+elif trt.__version__ == support_trt_version["8.2"]:
+    import pycuda.driver as cuda
+
+    # Use autoprimaryctx if available (pycuda >= 2021.1) to
+    # prevent issues with other modules that rely on the primary
+    # device context.
+    try:
+        import pycuda.autoprimaryctx
+    except ModuleNotFoundError:
+        import pycuda.autoinit
+else:
+    raise RuntimeError(
+        f"Unsupported TensorRT version: {trt.__version__}"
+        f"supported versions: {support_trt_version}"
+    )
 
 
 class TensorRTBackend(IBackend):
     NAME = "TensorRT"
-    SUPPORTED_VERISONS = ["8.6"]
-    SUPPORTED_DEVICES = ["CPU", "GPU", "MYRIAD", "HDDL", "HETERO"]
+    SUPPORTED_VERISONS = support_trt_version.values()
+    SUPPORTED_DEVICES = ["GPU"]
 
     def __init__(self, device="GPU") -> None:
         trt_version: str = trt.__version__
@@ -33,9 +94,9 @@ class TensorRTBackend(IBackend):
             assert self.context
 
             # Setup I/O bindings
-            self.inputs = []
-            self.outputs = []
-            self.allocations = []
+            self.inputs: List[dict] = []
+            self.outputs: List[dict] = []
+            self.allocations: List[int] = []
 
             for i in range(self.engine.num_bindings):
                 is_input = False
@@ -59,7 +120,7 @@ class TensorRTBackend(IBackend):
                 for s in shape:
                     size *= s
 
-                allocation = cuda_call(cudart.cudaMalloc(size))
+                allocation = CUDA_Utils.get_allocation(size)
                 host_allocation = None if is_input else np.zeros(shape, dtype)
                 binding = {
                     "index": i,
@@ -94,49 +155,15 @@ class TensorRTBackend(IBackend):
 
     def infer(self, input: np.ndarray) -> np.ndarray:
         # Copy I/O and Execute
-        memcpy_host_to_device(self.inputs[0]["allocation"], np.ascontiguousarray(input))
+
+        # 1. Copy input to device
+        CUDA_Utils.memcpy_host_to_device(self.inputs[0]["allocation"], np.ascontiguousarray(input))
+
+        # 2. Execute
+        # https://docs.nvidia.com/deeplearning/tensorrt/api/python_api/infer/Core/ExecutionContext.html#tensorrt.IExecutionContext.execute_v2
         self.context.execute_v2(self.allocations)
-        self.context.execute_v2(self.allocations)
-        for o in range(len(self.outputs)):
-            memcpy_device_to_host(self.outputs[o]["host_allocation"], self.outputs[o]["allocation"])
-        outputs: List[np.ndarray] = [o["host_allocation"] for o in self.outputs]
+
+        # 3. Copy output to host
+        outputs = CUDA_Utils.memcpy_device_to_host(self.outputs)
         output = outputs[0]
         return output
-
-
-# Wrapper for cudaMemcpy which infers copy size and does error checking
-def memcpy_host_to_device(device_ptr: int, host_arr: np.ndarray):
-    nbytes = host_arr.size * host_arr.itemsize
-    cuda_call(
-        cudart.cudaMemcpy(
-            device_ptr, host_arr, nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice
-        )
-    )
-
-
-# Wrapper for cudaMemcpy which infers copy size and does error checking
-def memcpy_device_to_host(host_arr: np.ndarray, device_ptr: int):
-    nbytes = host_arr.size * host_arr.itemsize
-    cuda_call(
-        cudart.cudaMemcpy(
-            host_arr, device_ptr, nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost
-        )
-    )
-
-
-def cuda_call(call):
-    def check_cuda_err(err):
-        if isinstance(err, cuda.CUresult):
-            if err != cuda.CUresult.CUDA_SUCCESS:
-                raise RuntimeError("Cuda Error: {}".format(err))
-        if isinstance(err, cudart.cudaError_t):
-            if err != cudart.cudaError_t.cudaSuccess:
-                raise RuntimeError("Cuda Runtime Error: {}".format(err))
-        else:
-            raise RuntimeError("Unknown error type: {}".format(err))
-
-    err, res = call[0], call[1:]
-    check_cuda_err(err)
-    if len(res) == 1:
-        res = res[0]
-    return res
