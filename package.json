@@ -1,0 +1,35 @@
+{
+  "name": "deep-object-detect-track",
+  "version": "1.0.0-beta.1",
+  "description": "A deep learning deployment project to detect and track objects in videos",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "deep learning",
+    "object detection",
+    "object tracking",
+    "video analysis",
+    "tensorrt",
+    "openivino",
+    "yolov5"
+  ],
+  "author": "HenryZhuHR <henryzhuhr@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:HenryZhuHR/deep-object-detect-track.git"
+  },
+  "private": true,
+  "license": "GPL-3.0",
+  "bugs": "https://github.com/HenryZhuHR/deep-object-detect-track/issues",
+  "devDependencies": {
+    "@vuepress/client": "2.0.0-beta.67",
+    "@vuepress/markdown": "2.0.0-beta.67",
+    "@vuepress/theme-default": "2.0.0-beta.67",
+    "vue": "^3.3.8",
+    "vuepress": "2.0.0-beta.67"
+  }
+}
