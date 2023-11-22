@@ -49,6 +49,10 @@ def main() -> int:
 
     img = cv2.imread(args.input)  # H W C
 
+    # -- warm up
+    input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
+    output_t = backend.infer(input_t)
+
     # -- do inference
     start_time = cv2.getTickCount()
     input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W

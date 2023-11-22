@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     input_params.threshold.score = 0.5;
     input_params.threshold.conf = 0.5;
     input_params.threshold.nms = 0.5;
-    auto backend = Backend::GetBackend(BackendType::OPENVINO, input_params);
+    auto backend = Backend::GetBackend(BackendType::TENSORRT, input_params);
 
     backend->LoadModel(model_path);
 

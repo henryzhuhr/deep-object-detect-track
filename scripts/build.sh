@@ -12,7 +12,16 @@ fi
 
 cd "$BUILD_DIR"
 rm CMakeCache.txt
-cmake ..
-make
+cmake .. -G Ninja
+
+if [ "$(uname)" = "Darwin" ]; then
+    NUM_CORES=`sysctl -n hw.ncpu`
+elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
+    NUM_CORES=`nproc --all`
+else
+    NUM_CORES=4
+fi
+
+ninja -j $NUM_CORES
 
 ./infer

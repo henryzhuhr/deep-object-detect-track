@@ -1,3 +1,4 @@
+import warnings
 from dlinfer.backend.interface import IBackend
 
 
@@ -13,10 +14,11 @@ class InferBackends:
             from .b_openvino import OpenVINOBackend
         except ImportError:
             OpenVINOBackend = None
-        self.OpenVINOBackend= OpenVINOBackend
+        self.OpenVINOBackend = OpenVINOBackend
 
         try:
             from .b_tensorrt import TensorRTBackend
         except ImportError:
             TensorRTBackend = None
+        from .b_tensorrt import TensorRTBackend
         self.TensorRTBackend = TensorRTBackend
