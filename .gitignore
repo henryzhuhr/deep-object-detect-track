@@ -1,3 +1,7 @@
+tmp/
+tmps/
+temp/
+temps/
 resource/
 node_modules
 

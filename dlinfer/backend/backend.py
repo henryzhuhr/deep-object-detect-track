@@ -20,5 +20,4 @@ class InferBackends:
             from .b_tensorrt import TensorRTBackend
         except ImportError:
             TensorRTBackend = None
-        from .b_tensorrt import TensorRTBackend
         self.TensorRTBackend = TensorRTBackend
