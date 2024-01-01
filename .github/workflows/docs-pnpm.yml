@@ -29,6 +29,9 @@ jobs:
             - recursive: true
               args: [--frozen-lockfile, --strict-peer-dependencies]
             - args: [--global, gulp, prettier, typescript]
+      
+      - name: Build VuePress site
+        run: pnpm docs:build
 
       - name: Deploy to GitHub Pages
         # @see https://github.com/crazy-max/ghaction-github-pages
