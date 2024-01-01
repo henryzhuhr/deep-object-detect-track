@@ -1,6 +1,6 @@
 import { defineUserConfig } from 'vuepress';
-import { defaultTheme } from '@vuepress/theme-default';
 import { MarkdownOptions } from '@vuepress/markdown'
+import { defaultTheme } from '@vuepress/theme-default';
 
 const markdownOptions: MarkdownOptions = {
   headers: {
