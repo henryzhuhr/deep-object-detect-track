@@ -3,7 +3,15 @@ tmps/
 temp/
 temps/
 resource/
+
+# Vuepress/Vitepress
 node_modules
+docs/.vuepress/.temp
+docs/.vuepress/.cache
+docs/.vuepress/dist
+docs/.vitepress/dist
+docs/.vitepress/cache
+
 
 wget-log
 

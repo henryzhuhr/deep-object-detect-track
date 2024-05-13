@@ -1,5 +1,12 @@
+---
+lastUpdated: true
+editLink: true
+footer: true
+outline: deep
+---
+
 # 目标检测数据集处理
-这是一个目标检测预处理的说明稳定
+这是一个目标检测预处理的说明，事实上这个版本已经用了很多年了，比较老了，
 
 ## 功能
 - [x] VOC -> yolo
@@ -54,9 +61,9 @@ labelImg
 ```
 
 在 Ubuntu 下启动后的界面如下（Windows 版本可能略有差异）
-![start](./images/labelImg-start.png)
+![start](./dataset/images/labelImg-start.png)
 
-<!-- ![start](./images/labelImg-start-1.png) -->
+<!-- ![start](./dataset/images/labelImg-start-1.png) -->
 
 - 打开文件 : 标注单张图像（不推荐使用）
 - **打开目录** : 打开数据集存放的目录，目录下应该是图像的位置
@@ -68,10 +75,10 @@ labelImg
 - **数据集格式**: `PascalVOC` 和 `YOLO` 可选，一般选择 `PascalVOC` 即可，需要 `YOLO` 可以之后进行转换
 
 点击 `创建区块` 创建一个矩形框，画出范围
-![rect](./images/labelImg-rect-1.png)
+![rect](./dataset/images/labelImg-rect-1.png)
 
 每个类别都有对应的颜色加以区分
-![rect](./images/labelImg-rect-3.png)
+![rect](./dataset/images/labelImg-rect-3.png)
 
 完成一张图片的标注后，点击 `下一个图片`
 
