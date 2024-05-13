@@ -5,6 +5,8 @@ temps/
 resource/
 node_modules
 
+wget-log
+
 *.code-workspace
 # Byte-compiled / optimized / DLL files
 __pycache__/

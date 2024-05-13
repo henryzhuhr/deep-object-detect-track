@@ -16,7 +16,7 @@ from openvino.runtime import (
 
 class OpenVINOBackend(IBackend):
     NAME = "OpenVINO"
-    SUPPORTED_VERISONS = ["2023.0.1"]
+    SUPPORTED_VERISONS = ["2023.0.1","2024.1.0"]
     SUPPORTED_DEVICES = ["CPU", "GPU", "MYRIAD", "HDDL", "HETERO"]
 
     def __init__(self, device) -> None:
@@ -27,37 +27,36 @@ class OpenVINOBackend(IBackend):
         self.model: CompiledModel = None
 
     def load_model(self, model_path: str, verbose: bool = False) -> None:
-        try:
-            model: Model = self.core.read_model(model_path)
-            assert len(model.inputs) == 1, "Sample supports only single input topologies"
-            assert len(model.outputs) == 1, "Sample supports only single output topologies"
+        # fmt: off
+        model: Model = self.core.read_model(model_path)
+        assert len(model.inputs) == 1, "Sample supports only single input topologies"
+        assert len(model.outputs) == 1, "Sample supports only single output topologies"
+        
+        # -- Apply preprocessing
+        ppp = PrePostProcessor(model)
 
-            # -- Apply preprocessing
-            ppp = PrePostProcessor(model)
+        # 1) Set input tensor information:
+        # - input() provides information about a single model input
+        # - precision of tensor is supposed to be 'u8'
+        # - layout of data is 'NHWC'
+        # ppp.input().tensor().set_element_type(Type.u8).set_layout(
+        #     Layout("NHWC")
+        # )  # noqa: N400
 
-            # 1) Set input tensor information:
-            # - input() provides information about a single model input
-            # - precision of tensor is supposed to be 'u8'
-            # - layout of data is 'NHWC'
-            # ppp.input().tensor().set_element_type(Type.u8).set_layout(
-            #     Layout("NHWC")
-            # )  # noqa: N400
+        # 2) Here we suppose model has 'NCHW' layout for input
+        ppp.input().model().set_layout(Layout("NCHW"))
 
-            # 2) Here we suppose model has 'NCHW' layout for input
-            ppp.input().model().set_layout(Layout("NCHW"))
+        # 3) Set output tensor information:
+        # - precision of tensor is supposed to be 'f32'
+        ppp.output().tensor().set_element_type(Type.f32)
 
-            # 3) Set output tensor information:
-            # - precision of tensor is supposed to be 'f32'
-            ppp.output().tensor().set_element_type(Type.f32)
+        # 4) Apply preprocessing modifing the original 'model'
+        model = ppp.build()
 
-            # 4) Apply preprocessing modifing the original 'model'
-            model = ppp.build()
-
-            # -- Loading model to the device
-            compiled_model = self.core.compile_model(model, self.device)
-            self.model = compiled_model
-        except Exception as e:
-            raise RuntimeError(f"Failed to load model: {e}")
+        # -- Loading model to the device
+        compiled_model = self.core.compile_model(model, self.device)
+        self.model = compiled_model
+        # fmt: on
 
     def infer(self, input: np.ndarray) -> np.ndarray:
         """
@@ -76,3 +75,7 @@ class OpenVINOBackend(IBackend):
         results = self.model.infer_new_request({0: input})
         preds = next(iter(results.values()))
         return preds
+
+    def query_device(self):
+        """Query available devices for OpenVINO backend."""
+        return self.core.available_devices
