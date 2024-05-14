@@ -5,9 +5,9 @@ import cv2
 
 class Process:
     @staticmethod
-    def preprocess(img: cv2.Mat) -> np.ndarray:
+    def preprocess(img: cv2.Mat, img_size=(640, 640)) -> np.ndarray:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        input_t = cv2.resize(img, (640, 640))
+        input_t = cv2.resize(img, img_size)
         input_t = input_t.transpose(2, 0, 1)
         input_t = np.expand_dims(input_t, 0)
         input_t = input_t.astype(np.float32) / 255.0
@@ -24,9 +24,7 @@ class Process:
         return preds
 
     @staticmethod
-    def mark(
-        img: cv2.Mat, preds: np.ndarray, label_list: List[str], scale_h=1.0, scale_w=1.0
-    ):
+    def mark(img: cv2.Mat, preds: np.ndarray, label_list: List[str], scale_h=1.0, scale_w=1.0):
         for pred in preds:
             x1 = int(scale_w * pred[0])
             y1 = int(scale_h * pred[1])
@@ -64,15 +62,9 @@ def non_max_suppression(
     """
 
     # Checks
-    assert (
-        0 <= conf_thres <= 1
-    ), f"Invalid Confidence threshold {conf_thres}, valid values are between 0.0 and 1.0"
-    assert (
-        0 <= iou_thres <= 1
-    ), f"Invalid IoU {iou_thres}, valid values are between 0.0 and 1.0"
-    if isinstance(
-        predictions, (list, tuple)
-    ):  # YOLOv5 model in validation model, output = (inference_out, loss_out)
+    assert 0 <= conf_thres <= 1, f"Invalid Confidence threshold {conf_thres}, valid values are between 0.0 and 1.0"
+    assert 0 <= iou_thres <= 1, f"Invalid IoU {iou_thres}, valid values are between 0.0 and 1.0"
+    if isinstance(predictions, (list, tuple)):  # YOLOv5 model in validation model, output = (inference_out, loss_out)
         predictions = predictions[0]  # select only inference output
 
     bs = predictions.shape[0]  # batch size
@@ -94,9 +86,7 @@ def non_max_suppression(
         x[:, 5:] *= x[:, 4:5]  # conf = obj_conf * cls_conf
 
         # Box/Mask
-        box = xywh2xyxy(
-            x[:, :4]
-        )  # center_x, center_y, width, height) to (x1, y1, x2, y2)
+        box = xywh2xyxy(x[:, :4])  # center_x, center_y, width, height) to (x1, y1, x2, y2)
 
         # Detections matrix nx6 (xyxy, conf, cls)
         cls_preds = x[:, 5:]
@@ -124,9 +114,7 @@ def non_max_suppression(
         classes = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
         boxes, scores = x[:, :4] + classes, x[:, 4]  # boxes (offset by class), scores
 
-        def non_max_suppression_impl(
-            boxes: np.ndarray, confs: np.ndarray, iou_thres=0.6
-        ):
+        def non_max_suppression_impl(boxes: np.ndarray, confs: np.ndarray, iou_thres=0.6):
             x1 = boxes[:, 0]
             y1 = boxes[:, 1]
             x2 = boxes[:, 2]

@@ -16,10 +16,10 @@ from openvino.runtime import (
 
 class OpenVINOBackend(IBackend):
     NAME = "OpenVINO"
-    SUPPORTED_VERISONS = ["2023.0.1","2024.1.0"]
+    SUPPORTED_VERISONS = ["2023.0.1", "2024.1.0"]
     SUPPORTED_DEVICES = ["CPU", "GPU", "MYRIAD", "HDDL", "HETERO"]
 
-    def __init__(self, device) -> None:
+    def __init__(self, device="AUTO") -> None:
         ov_version: str = __version__
         super().__init__(ov_version)
         self.core: Core = Core()
@@ -78,4 +78,4 @@ class OpenVINOBackend(IBackend):
 
     def query_device(self):
         """Query available devices for OpenVINO backend."""
-        return self.core.available_devices
+        return ["AUTO"] + self.core.available_devices
