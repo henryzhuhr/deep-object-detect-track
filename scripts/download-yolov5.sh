@@ -1,11 +1,11 @@
 tag_name=v7.0
 model_list=(
-    yolov5n
+    # yolov5n
     yolov5s
-    yolov5m
-    yolov5l
-    yolov5x
-    yolov5n
+    # yolov5m
+    # yolov5l
+    # yolov5x
+    # yolov5n
 )
 
 weights_dir=./.cache/yolov5

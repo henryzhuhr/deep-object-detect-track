@@ -6,10 +6,11 @@ python3 -m pip install --upgrade pip
 
 # install pytorch according to the CUDA version
 if [ ! -z "${CUDA_VERSION}" ]; then
+    print_info "CUDA_VERSION is set to $CUDA_VERSION. Installing PyTorch with CUDA support."
     python3 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu$(echo $CUDA_VERSION | tr -d '.')
 else
-    python3 -m pip install torch torchvision
     print_warning "CUDA_VERSION is not set. Installing CPU version of PyTorch."
+    python3 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 fi
 
 
