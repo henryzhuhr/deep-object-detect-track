@@ -46,7 +46,7 @@ export default defineConfig({
     darkModeSwitchTitle: '切换到深色模式',
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/HenryZhuHR/deep-object-detect-track' }
     ]
   },
   markdown: {

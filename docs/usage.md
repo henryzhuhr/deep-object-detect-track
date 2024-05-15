@@ -14,8 +14,18 @@ outline: deep
 
 ### 获取代码
 
-```shell
+::: code-group
+```shell [HTTP]
 git clone --recursive https://github.com/HenryZhuHR/deep-object-detect-track.git
+```
+```shell [SSH]
+git clone --recursive git@github.com:HenryZhuHR/deep-object-detect-track.git
+```
+::: 
+
+进入项目目录
+
+```shell
 cd deep-object-detect-track
 ```
 
@@ -70,7 +80,7 @@ python3 -m pip install -r requirements.txt
 
 如果涉及部署流程，需要自行修改 `requirements.txt` 文件，将下列依赖取消注释掉，然后重新执行上述命令
 
-```requirements.txt
+```txt
 # Export ----------------------------------------------------------------------
 # coremltools>=6.0  # CoreML export
 # onnx>=1.10.0  # ONNX export
