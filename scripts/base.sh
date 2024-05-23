@@ -9,6 +9,7 @@ export PROJECT_HOME=$(pwd)
 export PROJECT_NAME=$(basename $PROJECT_HOME)
 export ENV_NAME=$(echo $PROJECT_NAME | tr '[:upper:]' '[:lower:]')
 export ENV_PATH=./.env/$ENV_NAME
+export PIP_QUIET=false
 
 # =============== Color Print Util ===============
 DEFAULT=$(echo -en '\033[0m')

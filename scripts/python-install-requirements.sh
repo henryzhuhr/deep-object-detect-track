@@ -2,42 +2,54 @@
 print_info "Using Python: $(which python3)"
 print_info "Installing Python requirements..."
 
-python3 -m pip install --upgrade pip
+if [ -z "${PIP_QUIET}" ]; then
+    PIP_QUIET=false
+fi
+
+if [ "$PIP_QUIET" = true ]; then
+    PIP_QUIET_FLAG="-q"
+else
+    PIP_QUIET_FLAG=""
+fi
+
+print_info "Upgrading pip..."
+python3 -m pip install $PIP_QUIET_FLAG --upgrade pip
 
 # install pytorch according to the CUDA version
 if [ ! -z "${CUDA_VERSION}" ]; then
     print_info "CUDA_VERSION is set to $CUDA_VERSION. Installing PyTorch with CUDA support."
-    python3 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu$(echo $CUDA_VERSION | tr -d '.')
+    python3 -m pip install torch torchvision $PIP_QUIET_FLAG --index-url https://download.pytorch.org/whl/cu$(echo $CUDA_VERSION | tr -d '.')
 else
     print_warning "CUDA_VERSION is not set. Installing CPU version of PyTorch."
-    python3 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+    python3 -m pip install torch torchvision $PIP_QUIET_FLAG --index-url https://download.pytorch.org/whl/cpu
 fi
 
 
+print_info "Installing other requirements..."
 mkdir -p .cache/yolov5
 if [ ! -f ".cache/yolov5/requirements.txt" ]; then
     cp projects/yolov5/requirements.txt .cache/yolov5/requirements.txt
 fi
-python3 -m pip install -r .cache/yolov5/requirements.txt
-python3 -m pip install -r requirements.txt
+python3 -m pip install $PIP_QUIET_FLAG -r .cache/yolov5/requirements.txt
+python3 -m pip install $PIP_QUIET_FLAG -r requirements.txt
 
-python3 -m pip install onnx
-python3 -m pip install onnx-simplifier
+python3 -m pip install $PIP_QUIET_FLAG onnx
+python3 -m pip install $PIP_QUIET_FLAG onnx-simplifier
 
 if [ ! -z "${CUDA_VERSION}" ]; then
-    python3 -m pip install onnxruntime-gpu
+    python3 -m pip install $PIP_QUIET_FLAG onnxruntime-gpu
 else
-    python3 -m pip install onnxruntime
+    python3 -m pip install $PIP_QUIET_FLAG onnxruntime
 fi
 
 if [ -d "$INTEL_OPENVINO_DIR" ]; then
     print_info "OpenVINO found in $INTEL_OPENVINO_DIR"
     print_info "Installing OpenVINO Python requirements from $INTEL_OPENVINO_DIR/python/requirements.txt"
-    python3 -m pip install -r  $INTEL_OPENVINO_DIR/python/requirements.txt
+    python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
 else
     print_warning "OpenVINO not found"
     print_info "Installing OpenVINO Python requirements from pip"
-    python3 -m pip install openvino-dev
+    python3 -m pip install $PIP_QUIET_FLAG openvino-dev
 fi
 
 
