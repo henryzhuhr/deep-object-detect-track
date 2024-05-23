@@ -15,3 +15,9 @@ fi
 source $ENV_PATH/bin/activate
 
 source scripts/python-install-requirements.sh
+
+echo ""
+print_info "Run command below to activate the environment:"
+echo ""
+echo "source $ENV_PATH/bin/activate"
+echo ""
