@@ -13,5 +13,9 @@
     ],
     "clangd.fallbackFlags": [
         "-l/home/zhr/program/openvino/runtime/include"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": [
+        "/opt/intel/openvino_2024/python"
     ]
 }
