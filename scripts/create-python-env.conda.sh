@@ -1,25 +1,13 @@
-# -- Uncomment and set to the desired Python version --
-# CUSTOM_PYTHON_VERSION=3.10 
-
-source scripts/base.sh
-
-export ENV_PATH=$ENV_PATH.conda
-
-if [ ! -d $ENV_PATH ]; then
-    SYS_PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')
-    if [ -z "$CUSTOM_PYTHON_VERSION" ]; then
-        ENV_PYTHON_VERSION=$SYS_PYTHON_VERSION
-    else
-        ENV_PYTHON_VERSION=$CUSTOM_PYTHON_VERSION
+function run_script {
+    if [ ! -f "$1" ]; then
+        echo "$1 not found"
+        exit 1
     fi
-    conda create -p $ENV_PATH -y python=$ENV_PYTHON_VERSION 
-    print_success "Create Python environment in '$ENV_PATH'"
-else
-    print_success "Conda environment '$ENV_PATH' already exists."
-fi
+    source $1
+}
 
-eval "$(conda shell.$(basename $SHELL) hook)"
-conda activate $ENV_PATH
-print_success "Activated $(python --version) in ($ENV_PATH)"
+run_script "scripts/base.sh"
+run_script "scripts/python-activate.conda.sh"
+run_script "scripts/python-install-requirements.sh"
 
-source scripts/python-install-requirements.sh
+print_activate_env_message

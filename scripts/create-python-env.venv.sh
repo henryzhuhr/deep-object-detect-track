@@ -1,23 +1,14 @@
-# -- Uncomment and set to the desired Python version --
-# CUSTOM_PYTHON_VERSION=3.10
+function run_script {
+    if [ ! -f "$1" ]; then
+        echo "$1 not found"
+        exit 1
+    fi
+    source $1
+}
 
-source scripts/base.sh
+run_script "scripts/base.sh"
+run_script "scripts/python-activate.venv.sh"
+run_script "scripts/python-install-requirements.sh"
 
-export ENV_PATH=$ENV_PATH.venv
+print_activate_env_message
 
-if [ ! -d $ENV_PATH ]; then
-    python3 -m venv $ENV_PATH
-    print_success "Create Python environment in '$ENV_PATH'"
-else
-    print_success "Python environment '$ENV_PATH' already exists."
-fi
-
-source $ENV_PATH/bin/activate
-
-source scripts/python-install-requirements.sh
-
-echo ""
-print_info "Run command below to activate the environment:"
-echo ""
-echo "source $ENV_PATH/bin/activate"
-echo ""

@@ -1,5 +1,5 @@
 from typing import List
-from .interface import IBackend
+from .interface import IDetectoBackends
 import numpy as np
 import onnxruntime as ort
 
@@ -8,7 +8,7 @@ available_providers = ort.get_available_providers()
 all_providers = ort.get_all_providers()
 
 
-class ONNXBackend(IBackend):
+class ONNXDetectorBackend(IDetectoBackends):
     NAME = "ONNX"
     SUPPORTED_VERISONS = ["1.8.0"]
     SUPPORTED_DEVICES = available_providers

@@ -1,6 +1,6 @@
 from typing import List
 import numpy as np
-from .interface import IBackend
+from .interface import IDetectoBackends
 
 import tensorrt as trt
 
@@ -72,7 +72,7 @@ else:
     )
 
 
-class TensorRTBackend(IBackend):
+class TensorRTDetectorBackend(IDetectoBackends):
     NAME = "TensorRT"
     SUPPORTED_VERISONS = support_trt_version.values()
     SUPPORTED_DEVICES = ["GPU"]

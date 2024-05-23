@@ -42,15 +42,15 @@ else
     python3 -m pip install $PIP_QUIET_FLAG onnxruntime
 fi
 
-if [ -d "$INTEL_OPENVINO_DIR" ]; then
-    print_info "OpenVINO found in $INTEL_OPENVINO_DIR"
-    print_info "Installing OpenVINO Python requirements from $INTEL_OPENVINO_DIR/python/requirements.txt"
-    python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
-else
-    print_warning "OpenVINO not found"
-    print_info "Installing OpenVINO Python requirements from pip"
-    python3 -m pip install $PIP_QUIET_FLAG openvino-dev
-fi
+# if [ -d "$INTEL_OPENVINO_DIR" ]; then
+#     print_info "OpenVINO found in $INTEL_OPENVINO_DIR"
+#     print_info "Installing OpenVINO Python requirements from $INTEL_OPENVINO_DIR/python/requirements.txt"
+#     python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
+# else
+#     print_warning "OpenVINO not found"
+#     print_info "Installing OpenVINO Python requirements from pip"
+#     python3 -m pip install $PIP_QUIET_FLAG openvino-dev
+# fi
 
 
 # freeze the requirements 

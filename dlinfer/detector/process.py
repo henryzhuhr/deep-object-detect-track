@@ -16,12 +16,9 @@ class Process:
         return input_t, scale_h, scale_w
 
     @staticmethod
-    def postprocess(preds: np.ndarray, conf_thres=0.25, iou_thres=0.45) -> np.ndarray:
-        preds = non_max_suppression(preds, conf_thres, iou_thres)[0]
-        # print(preds.shape)
-        # preds=cv2.dnn.NMSBoxesBatched(preds[:, :4], preds[:, 4], conf_thres, iou_thres)
-        # exit()
-        return preds
+    def postprocess(preds: np.ndarray, conf_thres=0.5, iou_thres=0.25) -> np.ndarray:
+        nms_pred = non_max_suppression(preds, conf_thres, iou_thres)[0] # cv2.dnn.NMSBoxes ?
+        return nms_pred
 
     @staticmethod
     def mark(img: cv2.Mat, preds: np.ndarray, label_list: List[str], scale_h=1.0, scale_w=1.0):
@@ -153,4 +150,14 @@ def xywh2xyxy(x: np.ndarray):
     y[..., 1] = x[..., 1] - x[..., 3] / 2  # top left y
     y[..., 2] = x[..., 0] + x[..., 2] / 2  # bottom right x
     y[..., 3] = x[..., 1] + x[..., 3] / 2  # bottom right y
+    return y
+
+
+def xyxy2xywh(x):
+    """Convert nx4 boxes from [x1, y1, x2, y2] to [x, y, w, h] where xy1=top-left, xy2=bottom-right."""
+    y = np.copy(x)
+    y[..., 0] = (x[..., 0] + x[..., 2]) / 2  # x center
+    y[..., 1] = (x[..., 1] + x[..., 3]) / 2  # y center
+    y[..., 2] = x[..., 2] - x[..., 0]  # width
+    y[..., 3] = x[..., 3] - x[..., 1]  # height
     return y

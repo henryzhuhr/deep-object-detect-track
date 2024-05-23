@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class IBackend(ABC):
+class IDetectoBackends(ABC):
     class ColorStr:
         @staticmethod
         def info(str_info: str):
@@ -20,7 +20,7 @@ class IBackend(ABC):
             return f"\033[00;33m{str_info}\033[0m"
 
     # name of inference backend, must be rewritten in subclass for checking
-    NAME = "IBackend"
+    NAME = "IDetectoBackends"
     # supported versions of inference backend, must be rewritten in subclass for checking version
     SUPPORTED_VERISONS = []
     # supported devices of inference backend, must be rewritten in subclass for checking device

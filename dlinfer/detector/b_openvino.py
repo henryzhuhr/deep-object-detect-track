@@ -1,5 +1,5 @@
 from typing import List
-from .interface import IBackend
+from .interface import IDetectoBackends
 import numpy as np
 from openvino.preprocess import PrePostProcessor
 from openvino.runtime import (
@@ -14,7 +14,7 @@ from openvino.runtime import (
 )
 
 
-class OpenVINOBackend(IBackend):
+class OpenVINODetectorBackend(IDetectoBackends):
     NAME = "OpenVINO"
     SUPPORTED_VERISONS = ["2023.0.1", "2024.1.0"]
     SUPPORTED_DEVICES = ["CPU", "GPU", "MYRIAD", "HDDL", "HETERO"]

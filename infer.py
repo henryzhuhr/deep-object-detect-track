@@ -5,7 +5,8 @@ import cv2
 import numpy as np
 import yaml
 
-from dlinfer import InferBackends, Process
+from dlinfer.detector import DetectorInferBackends
+from dlinfer.detector import Process
 
 
 def parse_args() -> argparse.Namespace:
@@ -16,7 +17,8 @@ def parse_args() -> argparse.Namespace:
         "-m",
         "--model",
         type=str,
-        default=".cache/yolov5/yolov5s_openvino_model/yolov5s.xml",
+        # default=".cache/yolov5/yolov5s_openvino_model/yolov5s.xml",
+        default=".cache/yolov5/yolov5s.onnx",
         help="Required. Path to an .xml or .onnx file with a trained model.",
     )
     args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
@@ -35,12 +37,12 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
-        backends = InferBackends()
-        # backend = backends.ONNXBackend(
-        #     device=args.device, inputs=["images"], outputs=["output0"]
-        # )
-        detector = backends.OpenVINOBackend(device="AUTO")
-        print("-- Available devices:", detector.query_device())
+        backends = DetectorInferBackends()
+        # -- OpenVINO
+        # detector = backends.OpenVINOBackend(device="AUTO")
+        # print("-- Available devices:", detector.query_device())
+        # -- ONNX
+        detector = backends.ONNXBackend(device=args.device, inputs=["images"], outputs=["output0"])
     except RuntimeError as e:
         print(e)
         return 1
@@ -70,15 +72,14 @@ def main() -> int:
 
         preds = Process.postprocess(output_t)
 
-        # -- mark
-        Process.mark(img, preds, label_list, scale_h, scale_w)
-
         end_time = cv2.getTickCount()
         total_time = (end_time - start_time) / cv2.getTickFrequency() * 1000
 
         print(
             f"Time infer/total: {infer_time:.2f}/{total_time:.2f} ms",
         )
+    # -- mark
+    Process.mark(img, preds, label_list, scale_h, scale_w)
     cv2.imwrite("tmp/out.jpg", img)
 
 
