@@ -4,3 +4,6 @@
 [submodule "projects/yolo_tracking"]
 	path = projects/yolo_tracking
 	url = git@github.com:mikel-brostrom/yolo_tracking.git
+[submodule "projects/ByteTrack"]
+	path = projects/ByteTrack
+	url = https://github.com/ifzhang/ByteTrack.git
