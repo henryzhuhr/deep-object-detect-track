@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import List
 
 import numpy as np
 
 from .basetrack import BaseTrack, TrackState
 from .kalman_filter import KalmanFilter
 from .basetrack import BaseTrack, TrackState
+
+
+from collections import deque
 
 
 class STrack(BaseTrack):
@@ -35,7 +37,9 @@ class STrack(BaseTrack):
         self.score = score
         self.clsid = clsid
 
-        self.history_track:List[np.ndarray] = []
+        self.__history_track = deque(maxlen=history_len)
+        self.__history_track.append(self._tlwh)
+        print(f"self.__history_track: {self.__history_track}")
 
         self.kalman_filter: KalmanFilter = None
         self.mean: np.ndarray = None
