@@ -1,12 +1,16 @@
+source ~/.$(basename $SHELL)rc
 # =============== Environment Variables ================
 # install python in `user` or `project` level
-export BASE_ENV_PATH=$HOME
-# export BASE_ENV_PATH=.
+# export BASE_ENV_PATH=$HOME
+export BASE_ENV_PATH=.
+
+# export ENV_NAME=dodt # Uncomment if custom env name
 
 # ================== Project Variables ==================
 export PROJECT_HOME=$(pwd)
 export PROJECT_NAME=$(basename $PROJECT_HOME)
-export ENV_NAME=$(echo $PROJECT_NAME | tr '[:upper:]' '[:lower:]')
+DEFAULT_ENV_NAME=$(echo $PROJECT_NAME | tr '[:upper:]' '[:lower:]')
+export ENV_NAME=$([ -z "$ENV_NAME" ] && echo $DEFAULT_ENV_NAME || echo $ENV_NAME)
 export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 
 # ================== Python Variables ==================

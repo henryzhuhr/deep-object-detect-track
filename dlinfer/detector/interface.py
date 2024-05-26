@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import warnings
 import numpy as np
 
 
@@ -28,9 +29,15 @@ class IDetectoBackends(ABC):
 
     def __init__(self, version: str) -> None:
         super().__init__()
-        assert self.NAME != "IBackend", "NAME must be rewritten in subclass"
-        assert len(self.SUPPORTED_VERISONS) > 0, "SUPPORTED_VERISONS must be rewritten in subclass"
-        assert len(self.SUPPORTED_DEVICES) > 0, "SUPPORTED_DEVICES must be rewritten in subclass"
+        if self.NAME == "IBackend":
+            warning_message = "NAME must be rewritten in subclass"
+            warnings.warn(f"\033[00;33m{warning_message}\033[0m")
+        if not len(self.SUPPORTED_VERISONS) > 0:
+            warning_message = "SUPPORTED_VERISONS must be rewritten in subclass"
+            warnings.warn(f"\033[00;33m{warning_message}\033[0m")
+        if not len(self.SUPPORTED_DEVICES) > 0:
+            warning_message = "SUPPORTED_DEVICES must be rewritten in subclass"
+            warnings.warn(f"\033[00;33m{warning_message}\033[0m")
         self._check_version(version)
 
     def _check_version(self, version: str):

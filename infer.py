@@ -13,17 +13,9 @@ def parse_args() -> argparse.Namespace:
     """Parse and return command line arguments."""
     parser = argparse.ArgumentParser(add_help=False)
     args = parser.add_argument_group("Options")
-    args.add_argument(
-        "-m",
-        "--model",
-        type=str,
-        # default=".cache/yolov5/yolov5s_openvino_model/yolov5s.xml",
-        default=".cache/yolov5/yolov5s.onnx",
-        help="Required. Path to an .xml or .onnx file with a trained model.",
-    )
+    args.add_argument("--model", type=str, default=".cache/yolov5/yolov5s.onnx")
     args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
     args.add_argument(
-        "-d",
         "--device",
         type=str,
         default="cpu",
@@ -36,16 +28,17 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    try:
-        backends = DetectorInferBackends()
-        # -- OpenVINO
-        # detector = backends.OpenVINOBackend(device="AUTO")
-        # print("-- Available devices:", detector.query_device())
-        # -- ONNX
-        detector = backends.ONNXBackend(device=args.device, inputs=["images"], outputs=["output0"])
-    except RuntimeError as e:
-        print(e)
-        return 1
+
+    backends = DetectorInferBackends()
+    ## -- ONNX
+    # detector = backends.ONNXBackend(device=args.device, inputs=["images"], outputs=["output0"])
+    ## -- OpenVINO
+    # detector = backends.OpenVINOBackend(device="AUTO")
+    # print("-- Available devices:", detector.query_device())
+    ## -- TensorRT
+    # args.model = ".cache/yolov5/yolov5s.engine"
+    detector = backends.TensorRTBackend()
+
     detector.load_model(args.model, verbose=True)
 
     with open(".cache/yolov5/yolov5s_openvino_model/yolov5s.yaml", "r") as f:

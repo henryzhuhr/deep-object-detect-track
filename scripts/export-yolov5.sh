@@ -15,4 +15,18 @@ cd $yolov5_path
 python3 export.py \
     --weights $MODEL_PATH \
     --data data/coco128.yaml \
-    --include onnx openvino 
+    --simplify --include onnx 
+
+python3 export.py \
+    --weights $MODEL_PATH \
+    --data data/coco128.yaml \
+    --simplify --include openvino 
+
+python3 export.py \
+    --weights $MODEL_PATH \
+    --data data/coco128.yaml \
+    --simplify --device 0,1 --include engine
+
+# 0,1 单 GPU 貌似报错，电脑有多少就得给多少
+# CUDA:0 (NVIDIA GeForce RTX 4090, 24217MiB)
+# CUDA:1 (NVIDIA GeForce RTX 4090, 24217MiB)
