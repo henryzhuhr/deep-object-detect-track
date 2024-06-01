@@ -15,7 +15,7 @@ export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 
 # ================== Python Variables ==================
 CUSTOM_PYTHON_VERSION=3.12    #  Uncomment and set to the desired Python version
-export PIP_QUIET=false
+export PIP_QUIET=true
 
 # ================== Enabling OpenVINO ==================
 export OPENVINO_HOME=/opt/intel/openvino_2024

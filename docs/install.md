@@ -38,28 +38,51 @@ git submodule init
 git submodule update
 ```
 
-### 创建虚拟环境
+### 创建环境并安装依赖
 
 确保安装了 conda ，如果没有安装，请从 [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) 下载，或者快速安装
-  
+
 ```shell
 # linux x64
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
+
+#### 方法一：使用提供的脚本
+
+
+查看 `scripts/base.sh` ，根据需要修改配置，执行命令自动创建并且激活虚拟环境
+
+::: code-group
+
+```shell [使用 venv 创建虚拟环境]
+bash scripts/python-activate.venv.sh
+```
+
+```shell [使用 conda 创建虚拟环境]
+bash scripts/python-activate.conda.sh
+```
+
+:::
+
+- **可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
+- 修改 `export PIP_QUIET=true` 为 `false` 可以查看安装过程
+- 该脚本会复制 `yolov5/requirements.txt` 到 `.cache/yolov5/requirements.txt`，可以自行修改 `.cache/yolov5/requirements.txt` 文件安装相关依赖，例如取消 `onnx` 的注释以支持 ONNX 格式的模型导出
+
+#### 方法二：手动安装
+
 创建虚拟环境
 ```shell
+export ENV_NAME=deep-object-detect-track
 # 在项目内安装环境(推荐)
-conda create -p .env/dodt python=3.10 -y
-conda activate ./.env/dodt
+conda create -p .env/$ENV_NAME python=3.10 -y
+conda activate ./.env/$ENV_NAME
 # 全局安装环境
-conda create -n dodt python=3.10 -y
-conda activate dodt
+conda create -n $ENV_NAME python=3.10 -y
+conda activate $ENV_NAME
 ```
 > Python 版本选择 3.10 是因为 Ubuntu 22.04 默认安装的 Python 版本是 3.10
-
-### 安装依赖
 
 1. 安装 PyTorch
 
@@ -75,7 +98,7 @@ pip install torch torchvision \
 
 ```shell
 pip install -r projects/yolov5/requirements.txt
-pip install -r requirements.txt
+pip install -r requirements/requirements.train.txt
 ```
 
 如果涉及部署流程，需要自行修改 `requirements.txt` 文件，将下列依赖取消注释掉，然后重新执行上述命令

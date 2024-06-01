@@ -31,10 +31,7 @@ if [ ! -f ".cache/yolov5/requirements.txt" ]; then
     cp projects/yolov5/requirements.txt .cache/yolov5/requirements.txt
 fi
 python3 -m pip install $PIP_QUIET_FLAG -r .cache/yolov5/requirements.txt
-python3 -m pip install $PIP_QUIET_FLAG -r requirements/requirements.txt
-
-python3 -m pip install $PIP_QUIET_FLAG onnx
-python3 -m pip install $PIP_QUIET_FLAG onnx-simplifier
+python3 -m pip install $PIP_QUIET_FLAG -r requirements/requirements.train.txt
 
 if [ ! -z "${CUDA_VERSION}" ]; then
     python3 -m pip install $PIP_QUIET_FLAG onnxruntime-gpu
@@ -42,16 +39,15 @@ else
     python3 -m pip install $PIP_QUIET_FLAG onnxruntime
 fi
 
-# if [ -d "$INTEL_OPENVINO_DIR" ]; then
-#     print_info "OpenVINO found in $INTEL_OPENVINO_DIR"
-#     print_info "Installing OpenVINO Python requirements from $INTEL_OPENVINO_DIR/python/requirements.txt"
-#     python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
-# else
-#     print_warning "OpenVINO not found"
-#     print_info "Installing OpenVINO Python requirements from pip"
-#     python3 -m pip install $PIP_QUIET_FLAG openvino-dev
-# fi
-
+if [ -d "$INTEL_OPENVINO_DIR" ]; then
+    print_info "OpenVINO found in $INTEL_OPENVINO_DIR"
+    print_info "Installing OpenVINO Python requirements from $INTEL_OPENVINO_DIR/python/requirements.txt"
+    python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
+else
+    print_warning "OpenVINO not found, skipping OpenVINO Python requirements installation"
+    # print_info "Installing OpenVINO Python requirements from pip"
+    # python3 -m pip install $PIP_QUIET_FLAG openvino-dev
+fi
 
 # freeze the requirements 
 # python3 -m pip list --format=freeze > requirements.version.txt
