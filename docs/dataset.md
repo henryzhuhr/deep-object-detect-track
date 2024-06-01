@@ -18,7 +18,7 @@ DATASET_DIR=/path/to/dataset
 这里准备好了一个示例数据集，可以下载
 
 ```bash
-wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/2024.6.1/bottle.tar.xz
+wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/v1.0.0/bottle.tar.xz
 tar -xvf ~/data/bottle.tar.xz -C ~/data
 ```
 

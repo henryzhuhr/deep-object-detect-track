@@ -1,7 +1,3 @@
 # deep-object-detect-track
-深度学习目标检测和跟踪
 
-
-## INT8量化和校准
-
-quantization and calibration
+查看[文档](https://henryzhuhr.github.io/deep-object-detect-track/)
