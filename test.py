@@ -1,5 +1,0 @@
-
-
-
-from dlinfer.detector.b_tensorrt import TensorRTDetectorBackend
-TensorRTDetectorBackend

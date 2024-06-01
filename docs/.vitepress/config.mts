@@ -16,8 +16,8 @@ export default defineConfig({
         text: '「项目文档」',
         items: [
           { text: '安装环境', link: '/install' },
-          { text: '模型训练', link: '/train' },
           { text: '数据集制作', link: '/dataset' },
+          { text: '模型训练', link: '/train' },
           { text: '模型部署', link: '/deploy' },
           // { text: '目标检测YOLOv5项目', link: '/yolo' },
         ]

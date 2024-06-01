@@ -31,7 +31,7 @@ if [ ! -f ".cache/yolov5/requirements.txt" ]; then
     cp projects/yolov5/requirements.txt .cache/yolov5/requirements.txt
 fi
 python3 -m pip install $PIP_QUIET_FLAG -r .cache/yolov5/requirements.txt
-python3 -m pip install $PIP_QUIET_FLAG -r requirements.txt
+python3 -m pip install $PIP_QUIET_FLAG -r requirements/requirements.txt
 
 python3 -m pip install $PIP_QUIET_FLAG onnx
 python3 -m pip install $PIP_QUIET_FLAG onnx-simplifier

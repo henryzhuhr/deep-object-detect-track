@@ -5,58 +5,61 @@ footer: true
 outline: deep
 ---
 
-# 目标检测数据集处理
-这是一个目标检测预处理的说明，事实上这个版本已经用了很多年了，比较老了，
+# 目标检测数据集制作
 
-## 功能
-- [x] VOC -> yolo
-- [x] [yolo -> coco](#yolo-to-coco): 转化为 COCO 数据集用于 [ultralytics/yolov5](https://github.com/ultralytics/yolov5) 项目
+## 数据集采集和归档
 
+将数据集放入如下目录
 
-## 数据集制作
+```bash
+DATASET_DIR=/path/to/dataset
+```
 
-> 需要说明的是，脚本只能按照标注进行分类的数据进行处理，如果一张图片有多个标注，是无法处理的     
-> 该项目仅仅是脚本库，不包括数据集
+这里准备好了一个示例数据集，可以下载
 
-### 数据采集与归档
+```bash
+wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/2024.6.1/bottle.tar.xz
+tar -xvf ~/data/bottle.tar.xz -C ~/data
+```
 
-将采集到的数据放置在 `dataset-custom/src` 目录下面，并且按照类别归档至对应文件夹下，参考的文件目如下
+随后可以设置数据集目录为
+```bash
+DATASET_DIR=~/data/bottle
+```
 
-数据集目录结构如下
+参考该目录构建自己的数据集，并且完成标注
+
+考虑到单张图像中可能出现不同类别的目标，因此数据集不一定需要按照类别进行划分，可以自定义划分，按照项目的需求任意归档数据集，但是请确保，每一张图像同级目录下有同名的**标签文件**
+
+按照类别划分的目录结构参考
 ```bash
 ·
-└── objdect-dataset # 数据集目录
-    ├── src         # 原始数据，按照类别进行归档
-    │   ├─ A        # 类别 A
-    │   ├─ B
+└── /path/to/dataset
+    ├── class_A         
+    │   ├─ file_A1.jpg  
+    │   ├─ file_A1.xml     
     │   └─ ...
-    ├── labeled     # 压缩、重命名后的文件，在这里进行标注
-    ├── VOC         # VOC 标准数据集，用于训练
-    └── coco        # coco 标准数据集，用于训练
+    └── class_B       
+        ├─ file_B1.jpg   
+        ├─ file_B1.xml   
+        └─ ...
 ```
-> `labeled` 目录是用于后续步骤[数据标注](#数据标注)的目录，这样我们可以在不破坏原始数据对情况下完成数据处理，如果不再需要原始数据，在完成此步骤后，可以删除 `src` 目录
 
-数据集的图片的大小不能太大，需要预先压缩尺寸，执行 `objdet_dataset_processor/resize.py`
+不进行类别划分的目录结构参考
 ```bash
-python3 objdet_dataset_processor/resize.py [--dataset-path] [--height] [--is_rename]
-# example
-python3 objdet_dataset_processor/resize.py -d ~/data/objdect-dataset --is_rename
+·
+└── /path/to/dataset    
+    ├─ file_1.jpg  
+    ├─ file_1.xml     
+    └─ ...
 ```
 
 
-### 数据标注
+## 启动标注工具
 
-在前面步骤中生成的 `labeled` 目录是用于数据标注的目录，选择图像注释工具 labelImg 进行标注。
-
-[labelImg](https://github.com/tzutalin/labelImg) 是 Python 编写、基于 Qt 图形界面的软件，标注以 PASCAL VOC 格式（ImageNet 使用的格式）另存为 `.xml` 文件。此外，它还支持 YOLO 格式。
-
-你可以通过从[源码编译](https://github.com/tzutalin/labelImg)的方式安装，也可以通过 pip3 快速安装
+使用 labelImg 标注，安装并启动
 ```bash
 pip install labelImg
-```
-
-安装后，可以在命令行启动
-```bash
 labelImg
 ```
 
@@ -72,7 +75,7 @@ labelImg
 - 上一个图像: 
 - **验证图像**: 验证标记无误，用于全部数据集标记完成后的检查工作
 - **保存**: 保存标记结果，快捷键 `Ctrl+s`
-- **数据集格式**: `PascalVOC` 和 `YOLO` 可选，一般选择 `PascalVOC` 即可，需要 `YOLO` 可以之后进行转换
+- **数据集格式**: 选择 `PascalVOC` ，后续再转化为 `YOLO`
 
 点击 `创建区块` 创建一个矩形框，画出范围
 ![rect](./dataset/images/labelImg-rect-1.png)
@@ -93,96 +96,35 @@ labelImg
 | space  |  将当前图像标记为已验证  | Ctrl+  |       放大       |
 |  ↑→↓←  | 键盘箭头移动选定的矩形框 | Ctrl–  |       缩小       |
 
+## 数据处理
 
-
-
-
-## 数据集预处理
-
-### 转换至可训练的标准数据集
-当标注完成后，我们就需要将图像和标注文件转换为我们所需要的数据格式
-
-可用的转换流程如下
+运行脚本，生成同名目录，但是会带 `-organized` 后缀，例如
 ```bash
-labeled -> VOC  # to PASCAL VOC
-            └─> YOLO -> COCO  # to YOLOv5 COCO
-```
-- [x] [转换成 VOC 格式](#转换成-VOC-格式)
-- [x] [转换成用于 YOLOv5 的 COCO 格式](#转换成用于-YOLOv5-的-COCO-格式)
-
-
-
-#### 转换成 VOC 格式
-
-<!-- **VOC2012** 数据集描述：
-- **Annotations**: 存放了数据`xml`格式存储的标签，里面包含了每张图片的`bounding box`信息，主要用于**目标检测**。
-- **ImageSets**: ImageSets中的Segmentation目录下存放了用于分割的train, val, trainval数据集的索引。
-- **JPEGImages**: 这里存放的就是JPG格式的原图，包含17125张彩色图片，但只有一部分(2913张)是用于分割的。
-- **SegmentationClass**: 语义分割任务中用到的label图片，PNG格式，共2913张，与原图的每一张图片相对应。
-- **SegmentationObject**: 实例分割任务用到的label图片，在语义分割中用不到，这里不详解介绍。
---- -->
-
-转换成 VOC 数据集流程如下
-```bash
-labeled -> VOC  # to PASCAL VOC
+python dataset-process.py --datadir ~/data/bottle
 ```
 
-执行 `labeled-voc.py` 将已经标记好的数据集转化成VOC格式
-```bash
-python3 scripts/dataset/labeled-voc.py [--dataset-path] [--height] [--is_rename]
-# example
-python3 scripts/dataset/labeled-voc.py
+生成 `~/data/bottle-organized` 用于数据集训练，并且该目录为 yolov5 中指定的数据集路径
+
+如果不需要完全遍历数据集、数据集自定义路径，则在 `get_all_label_files()` 函数中传入自定义的 `custom_get_all_files` 函数，以获取全部文件路径，该自定义函数可以参考 `default_get_all_files()`
+
+```python
+def default_get_all_files(directory: str):
+    file_paths: List[str] = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file in [".DS_Store"]:
+                continue
+            file_paths.append(os.path.join(root, file))
+    return file_paths
 ```
 
-运行后会在 VOC 目录下类别文件 `classes.names` 和训练集文件 `train.txt` 、验证集文件 `val.txt`
+并且在调用的时候传入该参数
+
 ```bash
-·
-└── dataset-custom  # 数据集文件夹
-    ├── src         # 原始数据，按照类别进行归档
-    ├── labeled     # 压缩、重命名后的文件，在这里进行标注
-    └── VOC         # VOC 标准数据集，用于训练
-        ├── Annotations
-        ├── ImageSets
-        │   └── Main
-        │       ├── classes.names
-        │       ├── train.txt
-        │       └── val.txt
-        └── JPEGImages            
+# -- get all label files, type: List[ImageLabel]
+label_file_list = get_all_label_files(args.datadir) # [!code --]
+label_file_list = get_all_label_files(          # [!code ++]
+    args.datadir,                               # [!code ++]
+    custom_get_all_files=default_get_all_files  # [!code ++]
+)                                               # [!code ++]
 ```
-
-
-
-#### 转换成用于 YOLOv5 的 COCO 格式
-```bash
-VOC -> YOLO -> COCO  # to YOLOv5 COCO
-```
-
-
-执行 `voc-yolo.py` 将数据集从 VOC 转换成 YOLO
-```bash
-python3 scripts/dataset/voc-yolo.py [--conf]
-```
-
-执行 `yolo-coco.py` 将数据集从 YOLO 转换成 COCO (yolov5)
-```bash
-python3 scripts/dataset/yolo-coco.py [--conf]
-```
-
-运行后得到 YOLOv5 的 COCO 数据集，包含 `images`,`labels` 目录，目录下分别包含子目录 `train`,`val` 
-```bash
-·
-└── dataset-custom  # 数据集文件夹
-    ├── src         # 原始数据，按照类别进行归档
-    ├── labeled     # 压缩、重命名后的文件，在这里进行标注
-    └── coco        # coco 数据集，用于训练
-        ├── images
-        │   ├── train
-        │   └── val
-        └── labels   
-            ├── train
-            └── val
-```
-
-## 相关仓库
-
-- [labelImg](https://github.com/tzutalin/labelImg): 用于目标检测数据的图像标注软件

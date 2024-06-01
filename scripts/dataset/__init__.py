@@ -1,1 +1,0 @@
-from .labelparser import ObjDetectLabelParse

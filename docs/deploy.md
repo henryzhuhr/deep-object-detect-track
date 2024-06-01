@@ -23,14 +23,14 @@ cd projects/yolov5
 ```
 设定参数，执行
 ```shell
-python3 export.py \
+python export.py \
     --weights ../weights/yolov5s.pt \
     --data data/coco128.yaml \
     --include onnx openvino 
 ```
-- `--weights` 模型路径:
-- `--include` 训练时数据集参数:
-- `--data` 导出类型: 可以导出多个模型，用空格分隔
+- `--weights` 模型路径: 修改为自己训练好的模型路径
+- `--include` 导出类型: 可以导出多个模型，用空格分隔
+- `--data` 训练模型使用的数据集，主要利用到里面的类别数据
 
 ## 部署模型
 
@@ -41,7 +41,7 @@ python3 export.py \
 ### OpenVINO 部署
 
 ```shell
-python3 infer.py
+python infer.py
 ```
 
 
