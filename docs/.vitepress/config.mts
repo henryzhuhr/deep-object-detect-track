@@ -3,8 +3,8 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: '/deep-object-detect-track/',
-  title: "深度学习目标检测和跟踪",
-  description: "深度学习目标检测和跟踪项目文档",
+  title: "目标检测和跟踪",
+  description: "目标检测和跟踪项目文档",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -13,12 +13,13 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: '目标检测和跟踪项目文档',
+        text: '「项目文档」',
         items: [
-          { text: '项目使用文档', link: '/usage' },
-          { text: '目标检测YOLOv5项目', link: '/yolo' },
+          { text: '安装环境', link: '/install' },
+          { text: '模型训练', link: '/train' },
           { text: '数据集制作', link: '/dataset' },
-          { text: '目标检测和目标跟踪', link: '/preliminary' }
+          { text: '模型部署', link: '/deploy' },
+          // { text: '目标检测YOLOv5项目', link: '/yolo' },
         ]
       }
     ],
