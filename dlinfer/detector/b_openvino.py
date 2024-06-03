@@ -76,6 +76,7 @@ class OpenVINODetectorBackend(IDetectoBackends):
         preds = next(iter(results.values()))
         return preds
 
-    def query_device(self):
+    @staticmethod
+    def query_device():
         """Query available devices for OpenVINO backend."""
-        return ["AUTO"] + self.core.available_devices
+        return Core().available_devices

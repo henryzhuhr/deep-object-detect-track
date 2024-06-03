@@ -11,7 +11,7 @@ outline: deep
 
 将数据集放入如下目录
 
-```bash
+```shell
 DATASET_DIR=/path/to/dataset
 ```
 
@@ -19,14 +19,15 @@ DATASET_DIR=/path/to/dataset
 
 这里准备好了一个示例数据集，可以下载
 
-```bash
+```shell
 wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/v1.0.0/bottle.tar.xz
 tar -xvf ~/data/bottle.tar.xz -C ~/data
+mv ~/data/bottle ~/data/yolodataset
 ```
 
 随后可以设置数据集目录为
-```bash
-DATASET_DIR=~/data/bottle
+```shell
+DATASET_DIR=~/data/yolodataset
 ```
 
 参考该目录构建自己的数据集，并且完成标注
@@ -34,7 +35,7 @@ DATASET_DIR=~/data/bottle
 考虑到单张图像中可能出现不同类别的目标，因此数据集不一定需要按照类别进行划分，可以自定义划分，按照项目的需求任意归档数据集，但是请确保，每一张图像同级目录下有同名的**标签文件**
 
 按照类别划分的目录结构参考
-```bash
+```shell
 ·
 └── /path/to/dataset
     ├── class_A         
@@ -48,7 +49,7 @@ DATASET_DIR=~/data/bottle
 ```
 
 不进行类别划分的目录结构参考
-```bash
+```shell
 ·
 └── /path/to/dataset    
     ├─ file_1.jpg  
@@ -60,7 +61,7 @@ DATASET_DIR=~/data/bottle
 ## 启动标注工具
 
 使用 labelImg 标注，安装并启动
-```bash
+```shell
 pip install labelImg
 labelImg
 ```
@@ -101,11 +102,11 @@ labelImg
 ## 数据处理
 
 运行脚本，生成同名目录，但是会带 `-organized` 后缀，例如
-```bash
-python dataset-process.py --datadir ~/data/bottle
+```shell
+python dataset-process.py --datadir ~/data/yolodataset
 ```
 
-生成 `~/data/bottle-organized` 用于数据集训练，并且该目录为 yolov5 中指定的数据集路径
+生成的目录 `~/data/yolodataset-organized` 用于数据集训练，并且该目录为 yolov5 中指定的数据集路径
 
 如果不需要完全遍历数据集、数据集自定义路径，则在 `get_all_label_files()` 函数中传入自定义的 `custom_get_all_files` 函数，以获取全部文件路径，该自定义函数可以参考 `default_get_all_files()`
 
@@ -114,15 +115,13 @@ def default_get_all_files(directory: str):
     file_paths: List[str] = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file in [".DS_Store"]:
-                continue
             file_paths.append(os.path.join(root, file))
     return file_paths
 ```
 
 并且在调用的时候传入该参数
 
-```bash
+```python
 # -- get all label files, type: List[ImageLabel]
 label_file_list = get_all_label_files(args.datadir) # [!code --]
 label_file_list = get_all_label_files(          # [!code ++]

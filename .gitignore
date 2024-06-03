@@ -1,8 +1,12 @@
+# Ignore custom configuration files
+scripts/*.custom.sh
+
 tmp/
 tmps/
 temp/
 temps/
 resource/
+
 
 # Vuepress/Vitepress
 node_modules

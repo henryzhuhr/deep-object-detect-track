@@ -26,11 +26,11 @@ fi
 
 
 print_info "Installing other requirements..."
-mkdir -p .cache/yolov5
-if [ ! -f ".cache/yolov5/requirements.txt" ]; then
-    cp projects/yolov5/requirements.txt .cache/yolov5/requirements.txt
+mkdir -p $CACHE_DIR/yolov5
+if [ ! -f "$CACHE_DIR/yolov5/requirements.txt" ]; then
+    cp projects/yolov5/requirements.txt $CACHE_DIR/yolov5/requirements.txt
 fi
-python3 -m pip install $PIP_QUIET_FLAG -r .cache/yolov5/requirements.txt
+python3 -m pip install $PIP_QUIET_FLAG -r $CACHE_DIR/yolov5/requirements.txt
 python3 -m pip install $PIP_QUIET_FLAG -r requirements/requirements.train.txt
 
 if [ ! -z "${CUDA_VERSION}" ]; then
@@ -45,8 +45,8 @@ if [ -d "$INTEL_OPENVINO_DIR" ]; then
     python3 -m pip install $PIP_QUIET_FLAG -r $INTEL_OPENVINO_DIR/python/requirements.txt
 else
     print_warning "OpenVINO not found, skipping OpenVINO Python requirements installation"
-    # print_info "Installing OpenVINO Python requirements from pip"
-    # python3 -m pip install $PIP_QUIET_FLAG openvino-dev
+    print_info "Installing OpenVINO Python requirements from pip"
+    python3 -m pip install $PIP_QUIET_FLAG openvino-dev
 fi
 
 # freeze the requirements 

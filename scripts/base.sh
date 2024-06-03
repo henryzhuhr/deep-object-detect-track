@@ -1,28 +1,4 @@
 source ~/.$(basename $SHELL)rc
-# =============== Environment Variables ================
-# install python in `user` or `project` level
-# export BASE_ENV_PATH=$HOME
-export BASE_ENV_PATH=.
-
-# export ENV_NAME=dodt # Uncomment if custom env name
-
-# ================== Project Variables ==================
-export PROJECT_HOME=$(pwd)
-export PROJECT_NAME=$(basename $PROJECT_HOME)
-DEFAULT_ENV_NAME=$(echo $PROJECT_NAME | tr '[:upper:]' '[:lower:]')
-export ENV_NAME=$([ -z "$ENV_NAME" ] && echo $DEFAULT_ENV_NAME || echo $ENV_NAME)
-export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
-
-# ================== Python Variables ==================
-CUSTOM_PYTHON_VERSION=3.12    #  Uncomment and set to the desired Python version
-export PIP_QUIET=true
-
-# ================== Enabling OpenVINO ==================
-export OPENVINO_HOME=/opt/intel/openvino_2024
-if [ -d "$OPENVINO_HOME" ]; then
-    source $OPENVINO_HOME/setupvars.sh
-fi
-unset OPENVINO_HOME
 
 # =============== Color Print ===============
 DEFAULT=$(echo -en '\033[0m')
@@ -31,11 +7,31 @@ GREEN=$(echo -en '\033[00;32m')
 YELLOW=$(echo -en '\033[00;33m')
 CYAN=$(echo -en '\033[00;36m')
 
-function print_base { echo -e "$1- [$2] $3${DEFAULT}"; }
-function print_info { print_base "$CYAN" "INFO" "$1"; }
-function print_success { print_base "$GREEN" "SUCCESS" "$1"; }
-function print_warning { print_base "$YELLOW" "WARNING" "$1"; }
-function print_error { print_base "$RED" "ERROR" "$1"; }
+function print_base     { echo -e "$1- [$2] $3${DEFAULT}"; }
+function print_info     { print_base "$CYAN"    "INFO"      "$1"; }
+function print_tip      { print_base "$CYAN"    "TIP"       "$1"; }
+function print_success  { print_base "$GREEN"   "SUCCESS"   "$1"; }
+function print_warning  { print_base "$YELLOW"  "WARNING"   "$1"; }
+function print_error    { print_base "$RED"     "ERROR"     "$1"; }
+
+
+function run_script {
+    if [ ! -f "$1" ]; then
+        echo "$1 not found"
+        exit 1
+    fi
+    source $1
+}
 
 
 
+if [ -f "scripts/variables.custom.sh" ]; then
+    run_script "scripts/variables.custom.sh"
+    print_success "Loaded custom variables: 'scripts/variables.custom.sh'"
+elif [ -f "scripts/variables.sh" ]; then
+    run_script scripts/variables.sh
+    print_success "Loaded default variables: 'scripts/variables.sh'"
+else
+    echo "'scripts/variables.custom.sh' or 'scripts/variables.sh' not found"
+    exit 1
+fi

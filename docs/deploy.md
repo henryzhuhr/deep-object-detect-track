@@ -9,28 +9,19 @@ outline: deep
 
 ## 导出模型
 
-已经编写了一个脚本，可以直接导出
+提供一个导出脚本 `scripts/train.sh`，复制一份到项目目录下进行自定义修改（推荐）
 
 ```shell
-# 查看脚本，修改参数
-bash scripts/export-yolov5.sh
+cp scripts/export-yolov5.sh scripts/export-yolov5.custom.sh
 ```
 
-也可以自行导出，进入 yolov5 项目目录
+查看脚本 `scripts/export-yolov5.custom.sh` ，根据项目需求修改参数后执行
 
 ```shell
-cd projects/yolov5
+bash scripts/export-yolov5.custom.sh
+#zsh scripts/export-yolov5.custom.sh # zsh
 ```
-设定参数，执行
-```shell
-python export.py \
-    --weights ../weights/yolov5s.pt \
-    --data data/coco128.yaml \
-    --include onnx openvino 
-```
-- `--weights` 模型路径: 修改为自己训练好的模型路径
-- `--include` 导出类型: 可以导出多个模型，用空格分隔
-- `--data` 训练模型使用的数据集，主要利用到里面的类别数据
+
 
 ## 部署模型
 
@@ -38,12 +29,115 @@ python export.py \
 
 ### ONNX 部署
 
-### OpenVINO 部署
+修改 `scripts/variables.custom.sh` 文件中 `ENV_NAME` 如下
 
 ```shell
-python infer.py
+# export ENV_NAME="" # -- Uncomment to customize the environment name # [!code --]
+export ENV_NAME="deploy-onnx" # [!code ++]
+export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 ```
 
+然后执行脚本创建虚拟环境，并激活
+
+::: code-group
+
+```shell [使用 venv]
+bash scripts/create-python-env.sh -e venv -ni
+#zsh scripts/create-python-env.sh -e venv -ni # zsh
+```
+
+```shell [使用 conda]
+bash scripts/create-python-env.sh -e conda -ni
+#zsh scripts/create-python-env.sh -e conda -ni # zsh
+```
+
+:::
+
+根据上述脚本运行输出激活环境
+
+```shell
+- [INFO] Run command below to activate the environment:
+... # 复制这里出现的激活命令并执行
+```
+
+手动安装依赖
+
+```shell
+pip install -r requirements/requirements.txt
+pip install onnxruntime # CPU 版本
+# pip install onnxruntime-gpu # GPU 版本
+```
+
+修改 `infer.py` 文件，指定模型路径
+```python
+## ------ ONNX ------
+onnx_backend = backends.ONNXBackend
+print("-- Available devices:", providers := onnx_backend.SUPPORTED_DEVICES)
+detector = onnx_backend(
+    device=providers, inputs=["images"], outputs=["output0"]
+)
+```
+
+然后执行推理脚本
+
+```shell
+python infer.py --model .cache/yolov5/yolov5s.onnx
+```
+
+
+### OpenVINO 部署
+
+修改 `scripts/variables.custom.sh` 文件中 `ENV_NAME` 如下
+
+```shell
+# export ENV_NAME="" # -- Uncomment to customize the environment name # [!code --]
+export ENV_NAME="deploy-ov" # [!code ++]
+export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
+```
+
+然后执行脚本创建虚拟环境，并激活
+
+::: code-group
+
+```shell [使用 venv]
+bash scripts/create-python-env.sh -e venv -ni
+#zsh scripts/create-python-env.sh -e venv -ni # zsh
+```
+
+```shell [使用 conda]
+bash scripts/create-python-env.sh -e conda -ni
+#zsh scripts/create-python-env.sh -e conda -ni # zsh
+```
+
+:::
+
+根据上述脚本运行输出激活环境
+
+```shell
+- [INFO] Run command below to activate the environment:
+... # 复制这里出现的激活命令并执行
+```
+
+手动安装依赖
+
+```shell
+pip install -r requirements/requirements.txt
+pip install openvino
+```
+
+修改 `infer.py` 文件，指定模型路径
+```python
+## ------ ONNX ------
+ov_backend = backends.OpenVINOBackend
+print("-- Available devices:", ov_backend.query_device())
+detector = ov_backend(device="AUTO")
+```
+
+然后执行推理脚本
+
+```shell
+python infer.py --model .cache/yolov5/yolov5s_openvino_model/yolov5s.xml
+```
 
 ### TensorRT 部署
 

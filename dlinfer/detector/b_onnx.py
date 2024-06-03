@@ -10,22 +10,21 @@ all_providers = ort.get_all_providers()
 
 class ONNXDetectorBackend(IDetectoBackends):
     NAME = "ONNX"
-    SUPPORTED_VERISONS = ["1.8.0"]
+    SUPPORTED_VERISONS = []
     SUPPORTED_DEVICES = available_providers
 
     def __init__(
         self,
-        device: str = "CPUExecutionProvider",
+        device: List[str] = ["CPUExecutionProvider"],
         inputs: List[str] = ["input"],  # TODO in case of multiple inputs
         outputs: List[str] = ["output"],  # TODO in case of multiple outputs
     ) -> None:
-        if device.lower() == "cpu":
-            device = "CPUExecutionProvider"
-        assert device in self.SUPPORTED_DEVICES, (
-            f"specify device {device} is not supported, "
-            f"please choose one of supported device: {self.SUPPORTED_DEVICES}"
-        )
-        self.providers = [device]
+        for provider in device:
+            assert provider in self.SUPPORTED_DEVICES, (
+                f"specify device {device} is not supported, "
+                f"please choose one of supported device: {self.SUPPORTED_DEVICES}"
+            )
+        self.providers = device
         self.ort_session: ort.InferenceSession = None
         self.inputs = inputs
         self.outputs = outputs
@@ -45,15 +44,15 @@ class ONNXDetectorBackend(IDetectoBackends):
         if verbose:
             # fmt: off
             print(self.ColorStr.info("Parsing ONNX info:"))
-            print(self.ColorStr.info("  - providers:"), self.ort_session.get_providers())
-            print(self.ColorStr.info("  --- inputs:"), binding__input_names)
-            print(self.ColorStr.info("       -- names:"), binding__input_names)
-            print(self.ColorStr.info("       - shapes:"), binding__input_shapes)
-            print(self.ColorStr.info("       -- types:"), binding__input_types)
-            print(self.ColorStr.info("  --- outputs:"), binding_output_names)
-            print(self.ColorStr.info("       -- names:"), binding_output_shapes)
-            print(self.ColorStr.info("       - shapes:"), binding_output_shapes)
-            print(self.ColorStr.info("       -- types:"), binding_output_types)
+            print(self.ColorStr.info("- providers:"), self.ort_session.get_providers())
+            print(self.ColorStr.info("--  inputs:"), binding__input_names)
+            print(self.ColorStr.info("    -  names:  "), binding__input_names)
+            print(self.ColorStr.info("    - shapes:  "), binding__input_shapes)
+            print(self.ColorStr.info("    -  types:  "), binding__input_types)
+            print(self.ColorStr.info("-- outputs:"), binding_output_names)
+            print(self.ColorStr.info("    -  names:  "), binding_output_shapes)
+            print(self.ColorStr.info("    - shapes:  "), binding_output_shapes)
+            print(self.ColorStr.info("    -  types:  "), binding_output_types)
             # fmt: on
 
         # fmt: off

@@ -48,7 +48,7 @@ class IDetectoBackends(ABC):
         for sv in self.SUPPORTED_VERISONS:
             if version.startswith(sv):
                 return
-        raise RuntimeError(
+        warnings.warn(
             f"{self.NAME} version {version} is not supported, "
             f"please upgrade to support version: {self.SUPPORTED_VERISONS}"
         )

@@ -2,7 +2,6 @@ import argparse
 import os
 from typing import Dict
 import cv2
-import numpy as np
 import yaml
 
 from dlinfer.detector import DetectorInferBackends
@@ -15,14 +14,6 @@ def parse_args() -> argparse.Namespace:
     args = parser.add_argument_group("Options")
     args.add_argument("--model", type=str, default=".cache/yolov5/yolov5s.onnx")
     args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
-    args.add_argument(
-        "--device",
-        type=str,
-        default="cpu",
-        help="Optional. Specify the target device to infer on; CPU, GPU, GNA or HETERO: "
-        "is acceptable. The sample will look for a suitable plugin for device specified. "
-        "Default value is CPU.",
-    )
     return parser.parse_args()
 
 
@@ -30,19 +21,30 @@ def main() -> int:
     args = parse_args()
 
     backends = DetectorInferBackends()
-    ## -- ONNX
-    # detector = backends.ONNXBackend(device=args.device, inputs=["images"], outputs=["output0"])
-    ## -- OpenVINO
-    # detector = backends.OpenVINOBackend(device="AUTO")
-    # print("-- Available devices:", detector.query_device())
-    ## -- TensorRT
-    # args.model = ".cache/yolov5/yolov5s.engine"
-    detector = backends.TensorRTBackend()
+    # =============== Choose backend to Infer ===============
+    # ------ Choose one and comment out the others ------
+    ## ------ ONNX ------
+    onnx_backend = backends.ONNXBackend
+    print("-- Available devices:", providers := onnx_backend.SUPPORTED_DEVICES)
+    detector = onnx_backend(
+        device=providers, inputs=["images"], outputs=["output0"]
+    )
+
+    ## ------ OpenVINO ------
+    # ov_backend = backends.OpenVINOBackend
+    # print("-- Available devices:", ov_backend.query_device())
+    # detector = ov_backend(device="AUTO")
+
+    ## ------ TensorRT ------
+    # detector = backends.TensorRTBackend()
+    # =======================================================
 
     detector.load_model(args.model, verbose=True)
 
     with open(".cache/yolov5/yolov5s_openvino_model/yolov5s.yaml", "r") as f:
-        label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)["names"]
+        label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)[
+            "names"
+        ]
         label_list = list(label_map.values())
         # print(label_list)
 
@@ -73,7 +75,8 @@ def main() -> int:
         )
     # -- mark
     Process.mark(img, preds, label_list, scale_h, scale_w)
-    cv2.imwrite("tmp/out.jpg", img)
+    cv2.imwrite(save_path := "tmp/out.jpg", img)
+    print(f"-- output saved to '{save_path}'")
 
 
 if __name__ == "__main__":

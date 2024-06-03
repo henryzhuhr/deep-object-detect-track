@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 项目源码
-      link: https://henryzhuhr.github.io/deep-object-detect-track/
+      link: https://github.com/HenryZhuHR/deep-object-detect-track
     - theme: alt
       text: 项目文档
       link: /install
