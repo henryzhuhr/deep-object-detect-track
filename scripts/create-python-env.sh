@@ -6,8 +6,8 @@ source scripts/base.sh
 
 # Set default values
 env_provider="venv"
-install=true
-
+install=false
+verbose=false
 
 while [ $# -gt 0 ]
 do
@@ -18,9 +18,13 @@ case $key in
     shift # shift past argument
     shift # shift past value
     ;;
-    -ni|--no-install)
-    install=false
+    -i|--install)
+    install=true
     shift # shift past argument
+    ;;
+    -v|--verbose)
+    verbose=true
+    shift
     ;;
     -h|--help)
     echo "Usage: create-python-env.sh [OPTIONS]"
@@ -38,7 +42,7 @@ case $key in
 esac
 done
 
-print_info "Environment Provider set to: $env_provider"
+print_info "Python environment provider set to: $env_provider"
 
 if [ "$env_provider" = "venv" ]; then
     run_script "scripts/utils/python-activate.venv.sh"
@@ -54,7 +58,7 @@ if [ "$install" = true ]; then
     print_info "Installing Python requirements..."
     run_script "scripts/utils/python-install-requirements.sh"
 else
-    print_warning "Skipping Python requirements installation..."
+    print_warning "Skipping Python requirements installation. If you want to install them, add the '-i' or '--install' flag."
 fi
 
 print_activate_env_message

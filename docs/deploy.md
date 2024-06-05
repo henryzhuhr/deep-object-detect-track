@@ -7,6 +7,12 @@ outline: deep
 
 # 模型部署
 
+## 准备模型
+
+如果训练了自定义模型，或者下载了预训练模型，可以跳过这一步
+
+<!--@include: ./download-pretrian.md-->
+
 ## 导出模型
 
 提供一个导出脚本 `scripts/train.sh`，复制一份到项目目录下进行自定义修改（推荐）
@@ -42,13 +48,13 @@ export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 ::: code-group
 
 ```shell [使用 venv]
-bash scripts/create-python-env.sh -e venv -ni
-#zsh scripts/create-python-env.sh -e venv -ni # zsh
+bash scripts/create-python-env.sh -e venv
+#zsh scripts/create-python-env.sh -e venv # zsh
 ```
 
 ```shell [使用 conda]
-bash scripts/create-python-env.sh -e conda -ni
-#zsh scripts/create-python-env.sh -e conda -ni # zsh
+bash scripts/create-python-env.sh -e conda
+#zsh scripts/create-python-env.sh -e conda # zsh
 ```
 
 :::
@@ -87,6 +93,12 @@ python infer.py --model .cache/yolov5/yolov5s.onnx
 
 ### OpenVINO 部署
 
+<!-- 在运行 Openvino 前，请安装好 OpenVINO ，并手动激活环境   
+```shell
+source <openvino_install_path>/setupvars.sh
+source /opt/intel/openvino_2024/setupvars.sh
+``` -->
+
 修改 `scripts/variables.custom.sh` 文件中 `ENV_NAME` 如下
 
 ```shell
@@ -100,13 +112,13 @@ export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 ::: code-group
 
 ```shell [使用 venv]
-bash scripts/create-python-env.sh -e venv -ni
-#zsh scripts/create-python-env.sh -e venv -ni # zsh
-```
+bash scripts/create-python-env.sh -e venv
+#zsh scripts/create-python-env.sh -e venv # zsh
+``` 
 
 ```shell [使用 conda]
-bash scripts/create-python-env.sh -e conda -ni
-#zsh scripts/create-python-env.sh -e conda -ni # zsh
+bash scripts/create-python-env.sh -e conda
+#zsh scripts/create-python-env.sh -e conda # zsh
 ```
 
 :::
@@ -122,15 +134,17 @@ bash scripts/create-python-env.sh -e conda -ni
 
 ```shell
 pip install -r requirements/requirements.txt
-pip install openvino
+pip install openvino-dev
 ```
+<!-- # [ -d "$INTEL_OPENVINO_DIR" ] && pip install -r $INTEL_OPENVINO_DIR/python/requirements.txt || echo "Please install OpenVINO Toolkit" -->
 
 修改 `infer.py` 文件，指定模型路径
 ```python
 ## ------ ONNX ------
 ov_backend = backends.OpenVINOBackend
 print("-- Available devices:", ov_backend.query_device())
-detector = ov_backend(device="AUTO")
+detector = ov_backend(device="AUTO") # [!code --]
+detector = ov_backend(device="GPU")  # 指定使用 GPU 推理 # [!code ++]
 ```
 
 然后执行推理脚本

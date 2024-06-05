@@ -10,20 +10,9 @@ outline: deep
 
 ## 下载预训练模型
 
-下载预训练模型
+<!--@include: ./download-pretrian.md-->
 
-::: code-group
-
-```shell [bash]
-bash scripts/download-yolov5.sh yolov5s # 仅下载单个模型
-# bash scripts/download-yolov5.sh         # 下载所有模型
-```
-```shell [zsh]
-zsh scripts/download-yolov5.sh yolov5s # 仅下载单个模型
-# zsh scripts/download-yolov5.sh         # 下载所有模型
-```
-
-::: 
+## 训练模型
 
 提供一个训练脚本 `scripts/train.sh`，复制一份到项目目录下进行自定义修改（推荐）
 

@@ -2,11 +2,11 @@
 print_info "Using Python: $(which python3)"
 print_info "Installing Python requirements..."
 
-if [ -z "${PIP_QUIET}" ]; then
-    PIP_QUIET=false
+if [ -z "${verbose}" ]; then
+    verbose=false
 fi
 
-if [ "$PIP_QUIET" = true ]; then
+if [ "$verbose" = false ]; then
     PIP_QUIET_FLAG="-q"
 else
     PIP_QUIET_FLAG=""

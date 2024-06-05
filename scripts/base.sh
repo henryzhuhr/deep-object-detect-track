@@ -9,11 +9,10 @@ CYAN=$(echo -en '\033[00;36m')
 
 function print_base     { echo -e "$1- [$2] $3${DEFAULT}"; }
 function print_info     { print_base "$CYAN"    "INFO"      "$1"; }
-function print_tip      { print_base "$CYAN"    "TIP"       "$1"; }
+function print_tip      { print_base "$YELLOW"  "TIP"       "$1"; }
 function print_success  { print_base "$GREEN"   "SUCCESS"   "$1"; }
 function print_warning  { print_base "$YELLOW"  "WARNING"   "$1"; }
 function print_error    { print_base "$RED"     "ERROR"     "$1"; }
-
 
 function run_script {
     if [ ! -f "$1" ]; then
@@ -22,7 +21,6 @@ function run_script {
     fi
     source $1
 }
-
 
 
 if [ -f "scripts/variables.custom.sh" ]; then

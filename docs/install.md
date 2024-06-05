@@ -68,6 +68,8 @@ MacOS 系统不支持 CUDA Toolkit，可以使用 CPU 训练模型 (Yolov5 项�
 
 ## 安装环境
 
+这里安装的环境指的是需要训练的环境，如果不需要训练而是直接部署，请转至 「[模型部署](./deploy)」 文档
+
 提供两种方式安装， venv 或 conda
 
 - **venv** : 如果没有安装，请安装
@@ -110,24 +112,23 @@ zsh Miniconda3-latest-MacOSX-arm64.sh
 ```shell
 cp scripts/variables.sh scripts/variables.custom.sh
 ```
-
-- 修改 `export PIP_QUIET=true` 为 `false` 可以查看安装过程的详细信息\
+- `CACHE_DIR`: 用于存放一些缓存文件，例如 `yolov5/requirements.txt`，默认为项目目录下的 `.cache`
 - 安装过程会自动检测 `CUDA_VERSION` 以安装对应的 PyTorch 版本，否则默认安装 CPU 版本的 PyTorch；如果电脑有 NVIDIA GPU 但是不想安装 CUDA Toolkit 到全局系统（需要 sudo）可以取消注释 `export CUDA_VERSION=12.1` 以安装对应的 PyTorch 版本
 
 运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.sh` 
 
-执行命令自动创建并且激活虚拟环境 （**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**）
+执行命令自动创建并且激活虚拟环境，默认使用 `venv`，**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
 
 ::: code-group
 
 ```shell [使用 venv 创建虚拟环境]
-bash scripts/create-python-env.sh -e venv
-#zsh scripts/create-python-env.sh -e venv # zsh
+bash scripts/create-python-env.sh -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -i # zsh
 ```
 
 ```shell [使用 conda 创建虚拟环境]
-bash scripts/create-python-env.sh -e conda
-#zsh scripts/create-python-env.sh -e conda # zsh
+bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -e conda -i # zsh
 ```
 
 :::

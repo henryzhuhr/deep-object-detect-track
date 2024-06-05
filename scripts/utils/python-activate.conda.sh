@@ -21,17 +21,16 @@ fi
 
 eval "$(conda shell.$(basename $SHELL) hook)"
 conda activate $ENV_PATH
-print_success "Activated $(python --version) in ($ENV_PATH)"
-
+print_success "Environment $(python --version) Activated from ($ENV_PATH)"
 
 function print_activate_env_message {
     echo ""
-    print_info "Run command below to activate the environment:"
+    print_tip "Run command below to activate the environment:"
     echo ""
     echo "source ~/.`basename $SHELL`rc"
     echo "conda activate $ENV_PATH"
     echo ""
-    print_info "Then run command below to deactivate the environment:"
+    print_tip "Then run command below to deactivate the environment:"
     echo ""
     echo "source ~/.`basename $SHELL`rc"
     echo "conda deactivate"
