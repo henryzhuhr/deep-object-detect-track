@@ -13,6 +13,13 @@ outline: deep
 
 <!--@include: ./download-pretrian.md-->
 
+同时，也提供了一些转化好的模型（从 ultralytics/yolov5(v7.0) 的 [yolov5](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5s) 导出），可以直接使用进行部署
+
+```shell
+bash scripts/download-premodels.sh
+#zsh scripts/download-premodels.sh # zsh
+```
+
 ## 导出模型
 
 提供一个导出脚本 `scripts/train.sh`，复制一份到项目目录下进行自定义修改（推荐）
@@ -285,11 +292,15 @@ python3 export.py \
 ```
 - `--device` 指定 GPU 设备，有多少张卡就写多少张卡，用逗号分隔
 
-修改 `infer.py` 文件，指定模型路径
+修改 `infer.py` 文件
 ```python
 ## -- TensorRT
-args.model=".cache/yolov5/yolov5s.engine"
 detector = backends.TensorRTBackend()
+```
+
+执行推理
+```shell
+python infer.py --model .cache/yolov5/yolov5s.engine
 ```
 
 
@@ -298,4 +309,5 @@ detector = backends.TensorRTBackend()
 | Tensor 版本 | 模型    | 推理时间(ms) | 设备           |
 | ----------- | ------- | ------------ | -------------- |
 | 10.0(.1.6)  | yolov5s | 3.26 ~ 3.72  | RTX 4090 (24G) |
+| 10.0(.1.6)  | yolov5s | 10.41 ~ 10.7  | RTX 3050 (8G) |
 | 8.6(.1.6)   | yolov5s | 3.40 ~ 3.85  | RTX 4090 (24G) |

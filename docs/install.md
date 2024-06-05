@@ -31,23 +31,33 @@ cd deep-object-detect-track
 
 > 后续的脚本基于 `deep-object-detect-track` 目录下执行
 
-如果未能获取子模块，可以手动获取
-```shell
+如果未能获取子模块，可以手动获取，如果 `git submodule` 无法获取，可以使用 `git clone` 获取
+
+::: code-group
+
+```shell [git submodule]
 # in deep-object-detect-track directory
 git submodule init
 git submodule update
 ```
+
+```shell [git clone]
+git clone https://github.com/ultralytics/yolov5.git projects/yolov5
+```
+
+:::
+
 
 ## 系统要求
 
 ### 操作系统
 
 
-项目在 Linux(Ubuntu) 和 MacOS 系统并经过测试 ✅ ，经过测试的系统：
-- Ubuntu 22.04 jammy (CPU & GPU)
-- MacOS (CPU)
+项目在 Linux(Ubuntu) 和 MacOS 系统并经过测试 ，经过测试的系统：
+- ✅ Ubuntu 22.04 jammy (CPU & GPU)
+- ✅ MacOS (CPU)
 
-Windows 系统暂未测试也无适配计划，如果需要在 Windows 系统上运行，可以使用 WSL2 或者根据提供的脚本手动执行，不接受 Windows 系统的问题反馈
+> 项目不支持 Windows 系统 ❌ ，如果需要在 Windows 系统上运行，可以使用 WSL2 或者根据提供的脚本手动执行；虽然已经测试通过，但是不保证所有功能都能正常运行，因此不接受 Windows 系统的问题反馈
 
 ### GPU
 
@@ -62,6 +72,8 @@ export CUDA_HOME="/usr/local/cuda-${CUDA_VERSION}"
 export PATH="$CUDA_HOME/bin:$PATH"
 export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 ```
+
+> 事实上，Pytorch 1.8 开始就会在安装的时候自动安装对应的 CUDA Toolkit，因此不需要手动安装 CUDA Toolkit，因此可以跳过这一步
 
 MacOS 系统不支持 CUDA Toolkit，可以使用 CPU 训练模型 (Yolov5 项目暂不支持 MPS 训练)，但是推理过程可以使用 Metal ，参考 [*Introducing Accelerated PyTorch Training on Mac*](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/#getting-started) 和 [*MPS backend*](https://pytorch.org/docs/stable/notes/mps.html#mps-backend)
 
@@ -191,3 +203,6 @@ pip install -r requirements/requirements.train.txt
 - `onnx`: ONNX 格式的模型导出支持任意设备，需要取消注释，并且其他导出依赖于 ONNX 模型
 - `coremltools`: 必须依赖于 MacOS 系统
 - `nvidia-*`: 确保硬件支持 NVIDIA GPU
+
+
+

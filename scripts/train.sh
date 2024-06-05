@@ -49,3 +49,5 @@ python3 train.py \
     --device $TRAIN_DEVICE \
     --workers 8 \
     --project $PROJECT_HOME/tmp/runs/train
+
+# python train.py --data $env:USERPROFILE/data/bottle-organized/dataset.yaml  --cfg models/yolov5s.yaml --weights "../../.cache/yolov5/yolov5s.pt" --epochs 10 --batch 4 --device 0

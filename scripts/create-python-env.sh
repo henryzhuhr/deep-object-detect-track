@@ -30,7 +30,8 @@ case $key in
     echo "Usage: create-python-env.sh [OPTIONS]"
     echo "Options:"
     echo "  -e, --env-provider <provider>  Set the environment provider (venv or conda)"
-    echo "  -ni, --no-install              Skip Python requirements installation"
+    echo "  -i, --install                  Install Python requirements"
+    echo "  -v, --verbose                  Enable verbose mode"
     echo "  -h, --help                     Show this help message and exit"
     exit 0
     ;;

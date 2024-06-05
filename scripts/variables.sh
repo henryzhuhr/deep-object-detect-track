@@ -1,4 +1,3 @@
-
 # =============== Environment Variables ================
 # -- install python in `user` or `project` level
 # export BASE_ENV_PATH=$HOME    # --    user level
@@ -29,12 +28,3 @@ export CACHE_DIR=$PROJECT_HOME/.cache
 # export CUDA_VERSION=12.1
 # export CUDA_HOME="/usr/local/cuda-${CUDA_VERSION}"
 # export PATH="$CUDA_HOME/bin:$PATH"
-
-
-# ================== Enable OpenVINO ==================
-export OPENVINO_HOME=/opt/intel/openvino_2024
-if [ -d "$OPENVINO_HOME" ]; then
-    source $OPENVINO_HOME/setupvars.sh
-fi
-unset OPENVINO_HOME
-

@@ -8,7 +8,17 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
+      { text: '首页', link: '/' },
+      { text: '项目源码', link: 'https://github.com/HenryZhuHR/deep-object-detect-track' },
+      {
+        text: '项目文档',
+        items: [
+          { text: '安装环境', link: '/install' },
+          { text: '数据集制作', link: '/dataset' },
+          { text: '模型训练', link: '/train' },
+          { text: '模型部署', link: '/deploy' },
+        ]
+      }
     ],
 
     sidebar: [
@@ -19,7 +29,6 @@ export default defineConfig({
           { text: '数据集制作', link: '/dataset' },
           { text: '模型训练', link: '/train' },
           { text: '模型部署', link: '/deploy' },
-          // { text: '目标检测YOLOv5项目', link: '/yolo' },
         ]
       }
     ],

@@ -15,7 +15,7 @@ all_model_list=(
 )
 
 weights_dir=$CACHE_DIR/yolov5
-mkdir -p ${weights_dir}
+[ ! -d ${weights_dir} ] && mkdir -p ${weights_dir}
 
 model_list=($1)
 
