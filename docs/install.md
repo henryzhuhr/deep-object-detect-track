@@ -154,15 +154,13 @@ bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
 ::: code-group
 
 ```shell [在项目内安装环境(推荐)]
-export ENV_NAME=deep-object-detect-track
-conda create -p .env/$ENV_NAME python=3.10 -y
-conda activate ./.env/$ENV_NAME
+conda create -p .env/deep-object-detect-track python=3.10 -y
+conda activate ./.env/deep-object-detect-track
 ```
     
 ```shell [全局安装环境]
-export ENV_NAME=deep-object-detect-track
-conda create -n $ENV_NAME python=3.10 -y
-conda activate $ENV_NAME
+conda create -n deep-object-detect-track python=3.10 -y
+conda activate deep-object-detect-track
 ```
 
 :::
@@ -174,8 +172,7 @@ conda activate $ENV_NAME
 参考官网 [*INSTALL PYTORCH*](https://pytorch.org/get-started/locally/) 选择配置安装 PyTorch
 
 ```shell
-pip install torch torchvision \
-    --index-url https://download.pytorch.org/whl/cu121
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ```
 > 链接最后的 `cu121` 是需要根据系统的 CUDA 版本进行选择
 
@@ -183,7 +180,7 @@ pip install torch torchvision \
 
 ```shell
 pip install -r projects/yolov5/requirements.txt
-pip install -r requirements/requirements.train.txt
+# pip install -r requirements/requirements.train.txt
 ```
 
 如果涉及部署流程，需要自行修改 `requirements.txt` 文件，将下列依赖取消注释掉，然后重新执行上述命令
