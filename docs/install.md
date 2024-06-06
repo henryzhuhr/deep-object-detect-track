@@ -115,39 +115,7 @@ zsh Miniconda3-latest-MacOSX-arm64.sh
 
 ::: 
 
-
-### 方法一：使用提供的脚本
-
-
-提供的安装脚本依赖于基本环境变量 `scripts/variables.sh` ，可以复制一份到项目目录下进行自定义修改（推荐），如果不需要修改，可以直接执行
-
-```shell
-cp scripts/variables.sh scripts/variables.custom.sh
-```
-- `CACHE_DIR`: 用于存放一些缓存文件，例如 `yolov5/requirements.txt`，默认为项目目录下的 `.cache`
-- 安装过程会自动检测 `CUDA_VERSION` 以安装对应的 PyTorch 版本，否则默认安装 CPU 版本的 PyTorch；如果电脑有 NVIDIA GPU 但是不想安装 CUDA Toolkit 到全局系统（需要 sudo）可以取消注释 `export CUDA_VERSION=12.1` 以安装对应的 PyTorch 版本
-
-运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.sh` 
-
-执行命令自动创建并且激活虚拟环境，默认使用 `venv`，**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
-
-::: code-group
-
-```shell [使用 venv 创建虚拟环境]
-bash scripts/create-python-env.sh -i # -i 自动安装依赖
-#zsh scripts/create-python-env.sh -i # zsh
-```
-
-```shell [使用 conda 创建虚拟环境]
-bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
-#zsh scripts/create-python-env.sh -e conda -i # zsh
-```
-
-:::
-
-- 该脚本会复制 `yolov5/requirements.txt` 到 `.cache/yolov5/requirements.txt`，可以自行修改 `.cache/yolov5/requirements.txt` 文件安装相关依赖，例如取消 `onnx` 的注释以支持 ONNX 格式的模型导出；可以修改后再次执行脚本以重新安装依赖
-
-### 方法二：手动安装
+### 方法一：手动安装
 
 创建虚拟环境
 
@@ -179,27 +147,40 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 接下来安装其他依赖
 
 ```shell
-pip install -r projects/yolov5/requirements.txt
-# pip install -r requirements/requirements.train.txt
+pip install -r requirements/requirements.yolov5.txt
 ```
 
-如果涉及部署流程，需要自行修改 `requirements.txt` 文件，将下列依赖取消注释掉，然后重新执行上述命令
 
-```txt
-# Export ----------------------------------------------------------------------
-# coremltools>=6.0  # CoreML export
-# onnx>=1.10.0  # ONNX export
-# onnx-simplifier>=0.4.1  # ONNX simplifier
-# nvidia-pyindex  # TensorRT export
-# nvidia-tensorrt  # TensorRT export
-# scikit-learn<=1.1.2  # CoreML quantization
-# tensorflow>=2.4.0,<=2.13.1  # TF exports (-cpu, -aarch64, -macos)
-# tensorflowjs>=3.9.0  # TF.js export
-# openvino-dev>=2023.0  # OpenVINO export
+
+
+### 方法二：使用提供的脚本
+
+提供的安装脚本依赖于基本环境变量 `scripts/variables.sh` ，可以复制一份到项目目录下进行自定义修改（推荐），如果不需要修改，可以直接执行
+
+```shell
+cp scripts/variables.sh scripts/variables.custom.sh
 ```
-- `onnx`: ONNX 格式的模型导出支持任意设备，需要取消注释，并且其他导出依赖于 ONNX 模型
-- `coremltools`: 必须依赖于 MacOS 系统
-- `nvidia-*`: 确保硬件支持 NVIDIA GPU
+- `CACHE_DIR`: 用于存放一些缓存文件，例如 `yolov5/requirements.txt`，默认为项目目录下的 `.cache`
+- 安装过程会自动检测 `CUDA_VERSION` 以安装对应的 PyTorch 版本，否则默认安装 CPU 版本的 PyTorch；如果电脑有 NVIDIA GPU 但是不想安装 CUDA Toolkit 到全局系统（需要 sudo）可以取消注释 `export CUDA_VERSION=12.1` 以安装对应的 PyTorch 版本
 
+运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.sh` 
+
+执行命令自动创建并且激活虚拟环境，默认使用 `venv`，**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
+
+::: code-group
+
+```shell [使用 venv 创建虚拟环境]
+bash scripts/create-python-env.sh -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -i # zsh
+```
+
+```shell [使用 conda 创建虚拟环境]
+bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -e conda -i # zsh
+```
+
+:::
+
+- 该脚本会复制 `yolov5/requirements.txt` 到 `.cache/yolov5/requirements.txt`，可以自行修改 `.cache/yolov5/requirements.txt` 文件安装相关依赖，例如取消 `onnx` 的注释以支持 ONNX 格式的模型导出；可以修改后再次执行脚本以重新安装依赖
 
 

@@ -41,6 +41,7 @@ export default defineConfig({
     outline: {
       label: '页面导航'
     },
+    
     lastUpdated: {
       text: '最后更新于',
       formatOptions: {
@@ -59,6 +60,7 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/HenryZhuHR/deep-object-detect-track' }
     ]
   },
+  lastUpdated: true,
   markdown: {
     math: true,
     lineNumbers: false

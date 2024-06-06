@@ -20,14 +20,15 @@ DATASET_DIR=/path/to/dataset
 这里准备好了一个示例数据集，可以下载
 
 ```shell
-wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/v1.0.0/bottle.tar.xz
-tar -xvf ~/data/bottle.tar.xz -C ~/data
-mv ~/data/bottle ~/data/yolodataset
+wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/v1.0.0/drink.tar.bz2
+tar -xf ~/data/drink.tar.bz2 -C ~/data
+cp -r ~/data/drink ~/data/drink.unlabel
+rm -rf ~/data/drink.unlabel/**/*.xml
 ```
 
 随后可以设置数据集目录为
 ```shell
-DATASET_DIR=~/data/yolodataset
+DATASET_DIR=~/data/drink
 ```
 
 参考该目录构建自己的数据集，并且完成标注

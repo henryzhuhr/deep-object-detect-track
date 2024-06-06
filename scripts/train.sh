@@ -33,8 +33,8 @@ TRAIN_DATA_DIR=$DATASET_DIR-organized
 MODEL_NAME=yolov5s
 PRETRAINED_MODEL=$CACHE_DIR/yolov5/yolov5s.pt
 
-BATCH_SIZE=4
-EPOCHS=100
+BATCH_SIZE=2
+EPOCHS=50
 
 # =======================================================
 
@@ -55,21 +55,21 @@ cd $YOLOV5_PROJECT_HOME
 
 print_info "Start Training the model ..."
 
-python3 train.py \
-    --data $TRAIN_DATA_DIR/dataset.yaml \
-    --cfg models/$MODEL_NAME.yaml \
-    --weights $PRETRAINED_MODEL \
-    --epochs $EPOCHS --batch $BATCH_SIZE \
-    --device $TRAIN_DEVICE --workers 8 \
-    --project $PROJECT_HOME/tmp/train
-
 # python3 train.py \
 #     --data $TRAIN_DATA_DIR/dataset.yaml \
 #     --cfg models/$MODEL_NAME.yaml \
 #     --weights $PRETRAINED_MODEL \
-#     --rect --img-size 1280 \
 #     --epochs $EPOCHS --batch $BATCH_SIZE \
-#     --device $TRAIN_DEVICE --workers 128 --cache ram \
+#     --device $TRAIN_DEVICE --workers 8 \
 #     --project $PROJECT_HOME/tmp/train
+
+python3 train.py \
+    --data $TRAIN_DATA_DIR/dataset.yaml \
+    --cfg models/$MODEL_NAME.yaml \
+    --weights $PRETRAINED_MODEL \
+    --rect --img-size 640 \
+    --epochs $EPOCHS --batch $BATCH_SIZE \
+    --device $TRAIN_DEVICE --workers 128 --cache ram \
+    --project $PROJECT_HOME/tmp/train
 
 # python train.py --data $env:USERPROFILE/data/bottle-organized/dataset.yaml  --cfg models/yolov5s.yaml --weights "../../.cache/yolov5/yolov5s.pt" --epochs 10 --batch 4 --device 0
