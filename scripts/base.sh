@@ -22,6 +22,19 @@ function run_script {
     source $1
 }
 
+function copy_file_to_custom {
+    source_file=$1
+    f_without_suffix=$(echo $source_file | sed 's/\.sh//')
+    custom_file="$f_without_suffix.custom.sh"
+    if [ ! -f "$custom_file" ] && [ -f "$source_file" ] ; then
+        cp $source_file $custom_file
+        print_success "Copied '$source_file' to '$custom_file'"
+    fi
+}
+
+# copy_file_to_custom "scripts/variables.sh"
+# copy_file_to_custom "scripts/train.sh"
+# copy_file_to_custom "scripts/export-yolov5.sh"
 
 if [ -f "scripts/variables.custom.sh" ]; then
     run_script "scripts/variables.custom.sh"

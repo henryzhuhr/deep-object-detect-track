@@ -21,7 +21,7 @@ class DatasetProcessArgs:
     @staticmethod
     def get_args():
         parser = argparse.ArgumentParser()
-        parser.add_argument("--datadir", type=str, default="~/data/bottle")
+        parser.add_argument("-d","--datadir", type=str, default="~/data/drink")
         return parser.parse_args()
 
 
@@ -37,8 +37,11 @@ def main():
         os.makedirs(organized_datadir, exist_ok=False)
     else:
         raise FileExistsError(
-            f"Directory '{organized_datadir}' already exists, "
-            f"delete by 'rm -rf {organized_datadir}'"
+            f"Directory '{organized_datadir}' already exists."
+            f"\033[00;33m To avoid overwriting, please manually delete by\033[0m"
+            f"\033[00;32m 'rm -rf {organized_datadir}'\033[0m"
+            f"\033[00;33m and run this script again.\033[0m"
+            
         )
 
     images_dir = os.path.join(organized_datadir, "images")

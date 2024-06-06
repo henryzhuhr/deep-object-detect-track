@@ -1,0 +1,8 @@
+--extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple
+--extra-index-url https://pypi.org/simple
+
+opencv-python
+PyYAML
+requests
+tqdm
+pandas

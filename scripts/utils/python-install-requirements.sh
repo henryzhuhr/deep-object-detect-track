@@ -28,12 +28,7 @@ fi
 
 # ================== requirements.txt ==================
 print_info "Installing other requirements..."
-mkdir -p $CACHE_DIR/yolov5
-if [ ! -f "$CACHE_DIR/yolov5/requirements.txt" ]; then
-    cp projects/yolov5/requirements.txt $CACHE_DIR/yolov5/requirements.txt
-fi
-python3 -m pip install $PIPQ -r $CACHE_DIR/yolov5/requirements.txt
-python3 -m pip install $PIPQ -r requirements/requirements.train.txt
+python3 -m pip install $PIPQ -r requirements/torch.txt
 
 
 # ================== ONNX Runtime ==================

@@ -24,7 +24,7 @@ EXPORTED_MODEL_PATH=$PROJECT_HOME/.cache/yolov5/yolov5s.pt
 # CUDA:1 (NVIDIA GeForce RTX 4090, 24217MiB)
 # 电脑有多少显卡就得给多少
 TRT_EXPORTED_DEVICE="0,1" # Multiple GPUs
-TRT_EXPORTED_DEVICE="0"   # Single GPU
+# TRT_EXPORTED_DEVICE="0"   # Single GPU
 
 # =======================================================
 
