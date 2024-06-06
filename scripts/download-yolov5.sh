@@ -7,11 +7,15 @@ source scripts/base.sh
 tag_name=v7.0
 all_model_list=(
     yolov5n
+    yolov5n6
     yolov5s
+    yolov5s6
     yolov5m
+    yolov5m6
     yolov5l
+    yolov5l6
     yolov5x
-    yolov5n
+    yolov5x6
 )
 
 weights_dir=$CACHE_DIR/yolov5
