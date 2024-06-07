@@ -138,7 +138,7 @@ conda activate deep-object-detect-track
 > Python 版本选择 3.10 是因为 Ubuntu 22.04 默认安装的 Python 版本是 3.10
 
 
-- 如果电脑有 NVIDIA GPU，可以直接安装 [PyTorch]((https://pytorch.org/get-started/locally/)) 和其他依赖
+- 如果电脑有 NVIDIA GPU，可以直接安装 [PyTorch](https://pytorch.org/get-started/locally/) 和其他依赖
 ```shell
 pip install -r requirements.txt
 ```
