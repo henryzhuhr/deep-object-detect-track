@@ -8,21 +8,25 @@ from utils.dataset import get_all_label_files
 
 
 class DatasetProcessArgs:
+    @staticmethod
+    def get_args():
+        parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "-d", "--datadir", type=str, default="~/data/drink/"
+        )
+        return parser.parse_args()
+
     def __init__(self) -> None:
         args = self.get_args()
         self.datadir: str = os.path.expandvars(os.path.expanduser(args.datadir))
+        if self.datadir[-1] == "/" or self.datadir[-1] == "\\":
+            self.datadir = self.datadir[:-1]
 
         # check if the directory exists
         if not os.path.exists(self.datadir):
             raise FileNotFoundError(
                 f"Directory '{self.datadir}' not found, check '--datadir {args.datadir}'"
             )
-
-    @staticmethod
-    def get_args():
-        parser = argparse.ArgumentParser()
-        parser.add_argument("-d","--datadir", type=str, default="~/data/drink")
-        return parser.parse_args()
 
 
 def main():
@@ -41,7 +45,6 @@ def main():
             f"\033[00;33m To avoid overwriting, please manually delete by\033[0m"
             f"\033[00;32m 'rm -rf {organized_datadir}'\033[0m"
             f"\033[00;33m and run this script again.\033[0m"
-            
         )
 
     images_dir = os.path.join(organized_datadir, "images")

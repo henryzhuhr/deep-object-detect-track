@@ -1,8 +1,18 @@
--r requirements/torch.txt
--r requirements/yolov5.txt
-
+--index-url https://download.pytorch.org/whl/cu121
+--extra-index-url https://download.pytorch.org/whl/cpu
 --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple
 --extra-index-url https://pypi.org/simple
+
+# ====== pytorch ======
+torch==2.3.1 
+torchvision==0.18.1
+
+# ====== yolov5 dependencies ======
+opencv-python
+PyYAML
+requests
+tqdm
+pandas
 
 # onnxruntime
 onnxruntime==1.18.0
@@ -13,3 +23,9 @@ openvino==2024.1.0
 # tensorrt
 tensorrt==10.0.1
 cuda-python==12.1.0
+
+
+
+# ===== tracking =====
+# lapx
+# cython_bbox

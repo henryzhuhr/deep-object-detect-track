@@ -84,7 +84,7 @@ MacOS 系统不支持 CUDA Toolkit，可以使用 CPU 训练模型 (Yolov5 项�
 
 这里安装的环境指的是需要训练的环境，如果不需要训练而是直接部署，请转至 「[模型部署](./deploy)」 文档
 
-可以使用 venv 或 conda 创建虚拟环境
+提供两种方式安装， venv 或 conda
 
 - **venv** : 嵌入式设备的部署建议使用这种方案，以确保链接到系统的库，如果没有安装，请安装
 
@@ -117,22 +117,18 @@ zsh Miniconda3-latest-MacOSX-arm64.sh
 
 ::: 
 
+### 方法一：手动安装
 
 创建虚拟环境
 
 ::: code-group
 
-```shell [venv (推荐)]
-python -m venv .env/deep-object-detect-track
-source .env/deep-object-detect-track/bin/activate
-```
-
-```shell [项目内 conda (推荐)]
+```shell [在项目内安装环境(推荐)]
 conda create -p .env/deep-object-detect-track python=3.10 -y
 conda activate ./.env/deep-object-detect-track
 ```
     
-```shell [全局 conda]
+```shell [全局安装环境]
 conda create -n deep-object-detect-track python=3.10 -y
 conda activate deep-object-detect-track
 ```
@@ -141,7 +137,43 @@ conda activate deep-object-detect-track
 
 > Python 版本选择 3.10 是因为 Ubuntu 22.04 默认安装的 Python 版本是 3.10
 
-安装依赖，其中包含了 [PyTorch](https://pytorch.org/get-started/locally/) 以及 yolov5 项目依赖
+
+- 如果电脑有 NVIDIA GPU，可以直接安装 [PyTorch](https://pytorch.org/get-started/locally/) 和其他依赖
 ```shell
 pip install -r requirements.txt
 ```
+
+- 如果电脑没有 NVIDIA GPU，可以安装 CPU 版本的 PyTorch
+```shell
+pip install -r requirements/requirements-cpu.txt
+```
+
+
+### 方法二：使用提供的脚本
+
+提供的安装脚本依赖于基本环境变量 `scripts/variables.sh` ，可以复制一份到项目目录下进行自定义修改（推荐），如果不需要修改，可以直接执行
+
+```shell
+cp scripts/variables.sh scripts/variables.custom.sh
+```
+- `CACHE_DIR`: 用于存放一些缓存文件，例如 `yolov5/requirements.txt`，默认为项目目录下的 `.cache`
+- 安装过程会自动检测 `CUDA_VERSION` 以安装对应的 PyTorch 版本，否则默认安装 CPU 版本的 PyTorch；如果电脑有 NVIDIA GPU 但是不想安装 CUDA Toolkit 到全局系统（需要 sudo）可以取消注释 `export CUDA_VERSION=12.1` 以安装对应的 PyTorch 版本
+
+运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.sh` 
+
+执行命令自动创建并且激活虚拟环境，默认使用 `venv`，**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
+
+::: code-group
+
+```shell [使用 venv 创建虚拟环境]
+bash scripts/create-python-env.sh -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -i # zsh
+```
+
+```shell [使用 conda 创建虚拟环境]
+bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
+#zsh scripts/create-python-env.sh -e conda -i # zsh
+```
+
+:::
+

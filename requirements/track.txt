@@ -1,7 +1,0 @@
-pyyaml
-opencv-python
-numpy
-
-# ===== tracking =====
-lapx
-cython_bbox
