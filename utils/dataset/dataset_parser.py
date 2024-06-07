@@ -36,9 +36,6 @@ class VOCParser(BaseDatasetParser):
         with open(label_file, "r") as f:
             tree = ET.parse(label_file)
         root = tree.getroot()
-        folder = root.find("folder").text
-        filename = root.find("filename").text
-        path = root.find("path").text
         size = root.find("size")
         width = int(size.find("width").text)
         height = int(size.find("height").text)
