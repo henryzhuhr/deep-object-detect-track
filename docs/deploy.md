@@ -16,8 +16,8 @@ outline: deep
 同时，也提供了一些转化好的模型（从 ultralytics/yolov5(v7.0) 的 [yolov5](https://github.com/ultralytics/yolov5/releases/download/v7.0/yolov5s) 导出），可以直接使用进行部署
 
 ```shell
-bash scripts/download-premodels.sh
-#zsh scripts/download-premodels.sh # zsh
+bash scripts/download-release.sh
+#zsh scripts/download-release.sh # zsh
 ```
 
 ## 导出模型
