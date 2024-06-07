@@ -7,10 +7,11 @@ import yaml
 
 from dlinfer.detector.backend import DetectorInferBackends
 from dlinfer.detector import Process
+
 from utils.dataset.types import BBOX_XYXY, ObjectLabel_BBOX_XYXY
 from utils.dataset.variables import SUPPORTED_IMAGE_TYPES
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
+
 
 
 class AutoLabelArgs:
@@ -32,7 +33,7 @@ class AutoLabelArgs:
             "--model",
             type=str,
             # default=".cache/yolov5/yolov5s.onnx",
-            default="tmp/train/exp/weights/best.onnx",
+            default="temp/drink-yolov5x6/weights/best.onnx",
         )
         parser.add_argument("-t", "--conf-threshold", type=float, default=0.5)
         return parser.parse_args()
@@ -65,19 +66,20 @@ def main():
     # =============== Choose backend to Infer ===============
     backends = DetectorInferBackends()
     ## ------ ONNX ------
-    onnx_backend = backends.ONNXBackend
-    print("-- Available devices:", providers := onnx_backend.SUPPORTED_DEVICES)
-    detector = onnx_backend(
-        device=providers, inputs=["images"], outputs=["output0"]
-    )
+    # onnx_backend = backends.ONNXBackend
+    # print("-- Available devices:", providers := onnx_backend.SUPPORTED_DEVICES)
+    # detector = onnx_backend(
+    #     device=providers, inputs=["images"], outputs=["output0"]
+    # )
 
     ## ------ OpenVINO ------
-    # ov_backend = backends.OpenVINOBackend
-    # print("-- Available devices:", ov_backend.query_device())
-    # detector = ov_backend(device="GPU.0")
+    ov_backend = backends.OpenVINOBackend
+    print("-- Available devices:", ov_backend.query_device())
+    detector = ov_backend(device="AUTO")
 
     ## ------ TensorRT ------
     # detector = backends.TensorRTBackend()
+
     # =======================================================
     detector.load_model(args.model, verbose=True)
 
@@ -98,15 +100,19 @@ def main():
             continue
 
         # =============== Auto label ===============
+        start_time = cv2.getTickCount()
         img = cv2.imread(os.path.join(image_dir, file))  # H W C
         input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
         output_t = detector.infer(input_t)
         preds = Process.postprocess(output_t)
+        end_time = cv2.getTickCount()
+        infer_time = (end_time - start_time) / cv2.getTickFrequency() * 1000
 
         # print(f"File: {file}")
         # print(preds)
 
         bboxes: List[ObjectLabel_BBOX_XYXY] = []
+        cls_cnt = 0
         for pred in preds:
             x1 = int(scale_w * pred[0])
             y1 = int(scale_h * pred[1])
@@ -119,6 +125,7 @@ def main():
             bbox = BBOX_XYXY(int(x1), int(y1), int(x2), int(y2))
             cls = class_map[clsid]
             bboxes.append(ObjectLabel_BBOX_XYXY(cls, bbox))
+            cls_cnt += 1
 
         # =============== Save to xml ===============
         size = (img.shape[1], img.shape[0], img.shape[2])
@@ -148,6 +155,9 @@ def main():
 
         tree = ET.ElementTree(root)
         tree.write(xml_file, encoding="utf-8")
+        print(
+            f"Infer {infer_time:.3f} ms, File: {file}, {cls_cnt} objects saved to {xml_file} ({[b.cls for b in bboxes]})"
+        )
 
 
 if __name__ == "__main__":

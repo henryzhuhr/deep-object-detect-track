@@ -32,9 +32,9 @@ function copy_file_to_custom {
     fi
 }
 
-copy_file_to_custom "scripts/variables.sh"
-copy_file_to_custom "scripts/train.sh"
-copy_file_to_custom "scripts/export-yolov5.sh"
+# copy_file_to_custom "scripts/variables.sh"
+# copy_file_to_custom "scripts/train.sh"
+# copy_file_to_custom "scripts/export-yolov5.sh"
 
 if [ -f "scripts/variables.custom.sh" ]; then
     run_script "scripts/variables.custom.sh"

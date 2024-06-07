@@ -10,18 +10,19 @@ source scripts/base.sh
 # -- see issue if error: https://github.com/pytorch/pytorch/issues/110000
 
 # -- Multiple GPUs (use all)
+# export CUDA_VISIBLE_DEVICES="0,1"
 # TRAIN_DEVICE="0,1"
 
 # -- Multiple GPUs (use only one)
-export CUDA_VISIBLE_DEVICES=0
+# export CUDA_VISIBLE_DEVICES=0
 # export WORLD_SIZE=1
-TRAIN_DEVICE=0
+# TRAIN_DEVICE=1
 
 # -- Single GPU
 # TRAIN_DEVICE=0
 
 # -- CPU
-# TRAIN_DEVICE="cpu"
+TRAIN_DEVICE="cpu"
 
 # =======================================================
 
@@ -34,7 +35,7 @@ MODEL_NAME=yolov5s
 PRETRAINED_MODEL=$CACHE_DIR/yolov5/yolov5s.pt
 
 BATCH_SIZE=2
-EPOCHS=50
+EPOCHS=80
 
 # =======================================================
 
@@ -55,21 +56,21 @@ cd $YOLOV5_PROJECT_HOME
 
 print_info "Start Training the model ..."
 
-# python3 train.py \
-#     --data $TRAIN_DATA_DIR/dataset.yaml \
-#     --cfg models/$MODEL_NAME.yaml \
-#     --weights $PRETRAINED_MODEL \
-#     --epochs $EPOCHS --batch $BATCH_SIZE \
-#     --device $TRAIN_DEVICE --workers 8 \
-#     --project $PROJECT_HOME/tmp/train
-
 python3 train.py \
     --data $TRAIN_DATA_DIR/dataset.yaml \
     --cfg models/$MODEL_NAME.yaml \
     --weights $PRETRAINED_MODEL \
-    --rect --img-size 640 \
     --epochs $EPOCHS --batch $BATCH_SIZE \
-    --device $TRAIN_DEVICE --workers 128 --cache ram \
+    --device $TRAIN_DEVICE --workers 8 --cache disk \
     --project $PROJECT_HOME/tmp/train
+
+# python3 train.py \
+#     --data $TRAIN_DATA_DIR/dataset.yaml \
+#     --cfg models/$MODEL_NAME.yaml \
+#     --weights $PRETRAINED_MODEL \
+#     --rect --img-size 1280 \
+#     --epochs $EPOCHS --batch $BATCH_SIZE \
+#     --device $TRAIN_DEVICE --workers 128 --cache ram \
+#     --project $PROJECT_HOME/tmp/train
 
 # python train.py --data $env:USERPROFILE/data/bottle-organized/dataset.yaml  --cfg models/yolov5s.yaml --weights "../../.cache/yolov5/yolov5s.pt" --epochs 10 --batch 4 --device 0

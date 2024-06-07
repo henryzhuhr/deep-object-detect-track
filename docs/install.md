@@ -57,7 +57,9 @@ git clone https://github.com/ultralytics/yolov5.git projects/yolov5
 - ✅ Ubuntu 22.04 jammy (CPU & GPU)
 - ✅ MacOS (CPU)
 
-> 项目不支持 Windows 系统 ❌ ，如果需要在 Windows 系统上运行，可以使用 WSL2 或者根据提供的脚本手动执行；虽然已经测试通过，但是不保证所有功能都能正常运行，因此不接受 Windows 系统的问题反馈
+::: warning
+项目不支持 Windows 系统 ❌ ，如果需要在 Windows 系统上运行，可以使用 WSL2 或者根据提供的脚本手动执行；虽然已经测试通过，但是不保证所有功能都能正常运行，因此不接受 Windows 系统的问题反馈
+:::
 
 ### GPU
 
@@ -84,7 +86,7 @@ MacOS 系统不支持 CUDA Toolkit，可以使用 CPU 训练模型 (Yolov5 项�
 
 提供两种方式安装， venv 或 conda
 
-- **venv** : 如果没有安装，请安装
+- **venv** : 嵌入式设备的部署建议使用这种方案，以确保链接到系统的库，如果没有安装，请安装
 
 ::: code-group
 
@@ -135,22 +137,16 @@ conda activate deep-object-detect-track
 
 > Python 版本选择 3.10 是因为 Ubuntu 22.04 默认安装的 Python 版本是 3.10
 
-1. 安装 PyTorch
 
-参考官网 [*INSTALL PYTORCH*](https://pytorch.org/get-started/locally/) 选择配置安装 PyTorch
-
+- 如果电脑有 NVIDIA GPU，可以直接安装 [PyTorch]((https://pytorch.org/get-started/locally/)) 和其他依赖
 ```shell
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-```
-> 链接最后的 `cu121` 是需要根据系统的 CUDA 版本进行选择
-
-接下来安装其他依赖
-
-```shell
-pip install -r requirements/requirements.yolov5.txt
+pip install -r requirements.txt
 ```
 
-
+- 如果电脑没有 NVIDIA GPU，可以安装 CPU 版本的 PyTorch
+```shell
+pip install -r requirements/requirements-cpu.txt
+```
 
 
 ### 方法二：使用提供的脚本
@@ -180,7 +176,4 @@ bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
 ```
 
 :::
-
-- 该脚本会复制 `yolov5/requirements.txt` 到 `.cache/yolov5/requirements.txt`，可以自行修改 `.cache/yolov5/requirements.txt` 文件安装相关依赖，例如取消 `onnx` 的注释以支持 ONNX 格式的模型导出；可以修改后再次执行脚本以重新安装依赖
-
 

@@ -9,6 +9,10 @@ outline: deep
 
 ## 数据集采集和归档
 
+::: tip
+数据是比代码更重要的资产，因此不要放置在项目内
+:::
+
 将数据集放入如下目录
 
 ```shell
@@ -17,13 +21,19 @@ DATASET_DIR=/path/to/dataset
 
 > 需要注意的是，数据集通常需要放置在项目外的路径，例如 `~/data` 或 `$HOME/data` （推荐）（win 下为 `$env:USERPROFILE/data`）。如果放置在项目内，导致编辑器对于项目的索引过大，会导致编辑器卡顿
 
-这里准备好了一个示例数据集，可以下载
+这里准备好了一个示例数据集，可以下载，并保存在 `~/data/drink` 目录下
 
 ```shell
 wget -P ~/data https://github.com/HenryZhuHR/deep-object-detect-track/releases/download/v1.0.0/drink.tar.bz2
 tar -xf ~/data/drink.tar.bz2 -C ~/data
 cp -r ~/data/drink ~/data/drink.unlabel
 rm -rf ~/data/drink.unlabel/**/*.xml
+```
+
+为了方便可以在项目内建立软链接，软链接不会影响编辑器进行索引，但是可以方便查看
+    
+```shell
+ln -s ~/data resource/data
 ```
 
 随后可以设置数据集目录为
@@ -40,12 +50,12 @@ DATASET_DIR=~/data/drink
 ·
 └── /path/to/dataset
     ├── class_A         
-    │   ├─ file_A1.jpg  
-    │   ├─ file_A1.xml     
+    │   ├─ file_A1.jpg
+    │   ├─ file_A1.xml
     │   └─ ...
     └── class_B       
-        ├─ file_B1.jpg   
-        ├─ file_B1.xml   
+        ├─ file_B1.jpg
+        ├─ file_B1.xml
         └─ ...
 ```
 
@@ -53,8 +63,8 @@ DATASET_DIR=~/data/drink
 ```shell
 ·
 └── /path/to/dataset    
-    ├─ file_1.jpg  
-    ├─ file_1.xml     
+    ├─ file_1.jpg
+    ├─ file_1.xml
     └─ ...
 ```
 
@@ -104,10 +114,23 @@ labelImg
 
 运行脚本，生成同名目录，但是会带 `-organized` 后缀，例如
 ```shell
-python dataset-process.py --datadir ~/data/yolodataset
+python dataset-process.py --datadir ~/data/drink
 ```
 
-生成的目录 `~/data/yolodataset-organized` 用于数据集训练，并且该目录为 yolov5 中指定的数据集路径
+该脚本会自动递归地扫描目录 `~/data/drink` 下的所有 `.xml` 文件，并查看是否存在对应的 `.jpg` 文件
+
+::: tip
+因此，你可以不必担心目录结构，只需要确保每张图像有对应的标签文件即可，也不必担心没有标注完成的情况，脚本只处理以及标注完成的图像
+:::
+
+生成的目录 `~/data/drink-organized` 用于数据集训练，并且该目录为 yolov5 中指定的数据集路径
+
+
+## 数据自定义处理
+
+::: tip
+通常来说不需要自定义处理，只需要遵循上述的规则即可快速创建数据集，但是如果需要，可以参考下面提供的接口
+:::
 
 如果不需要完全遍历数据集、数据集自定义路径，则在 `get_all_label_files()` 函数中传入自定义的 `custom_get_all_files` 函数，以获取全部文件路径，该自定义函数可以参考 `default_get_all_files()`
 
@@ -129,4 +152,31 @@ label_file_list = get_all_label_files(          # [!code ++]
     args.datadir,                               # [!code ++]
     custom_get_all_files=default_get_all_files  # [!code ++]
 )                                               # [!code ++]
+```
+
+
+
+## 半自动标注
+
+训练完少量数据集后可以使用 `auto_label.py` 脚本进行半自动标注
+
+该脚本需要使用 OpenVINO 的模型进行推理，因此参考 [*导出模型*](./deploy.md#导出模型) 导出 openvino 模型，主要修改 `EXPORTED_MODEL_PATH` 为导出的模型路径和 数据集配置 `DATASET_CONFIG` ，然后注释导出命令 `python3 export.py ... --include onnx ` 和 `python3 export.py ... --include engine `
+
+```shell
+bash scripts/export-yolov5.sh
+```
+
+查看 `auto_label.py` 参数设置，然后执行
+```shell
+python auto_label.py
+```
+
+如果已经被标注，会提示 `If you want to re-label, please delete it by 'rm ~/data/drink.unlabel/cola/cola_0000.xml'` 的信息防止已经被标注的数据被覆盖，如果希望删除全部，可以用正则表达式
+```shell
+rm -rf ~/data/drink.unlabel/**/*.xml
+```
+
+随后可以用 LabelImg 进行**检查**和精细化调整
+```shell
+labelImg ~/data/drink.unlabel
 ```
