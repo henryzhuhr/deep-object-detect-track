@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import Dict
+from typing import Dict, List
 import cv2
 import tqdm
 import yaml
@@ -9,18 +9,33 @@ from dlinfer.detector import DetectorInferBackends
 from dlinfer.detector import Process
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse and return command line arguments."""
-    parser = argparse.ArgumentParser(add_help=False)
-    args = parser.add_argument_group("Options")
-    args.add_argument("--model", type=str, default=".cache/yolov5/yolov5s.onnx")
-    args.add_argument("-i", "--input", type=str, default="images/bus.jpg")
-    return parser.parse_args()
+class InferArgs:
+    @staticmethod
+    def get_args():
+        parser = argparse.ArgumentParser(add_help=False)
+        # fmt: off
+        parser.add_argument("-m", "--model", type=str, default=".cache/yolov5/yolov5s.onnx")
+        parser.add_argument("-c", "--config", type=str, default=".cache/yolov5/coco.yaml")
+        parser.add_argument("-s", "--img-size", nargs="+", type=int, default=[640, 640])
+        parser.add_argument("-i", "--input", type=str, default="images/bus.jpg")
+        # fmt: on
+        return parser.parse_args()
+
+    def __init__(self) -> None:
+        args = self.get_args()
+        self.model: str = args.model
+        self.config: str = args.config
+        if len(args.img_size) == 2:
+            self.img_size: List[int] = args.img_size
+        elif len(args.img_size) == 1:
+            self.img_size: List[int] = [args.img_size, args.img_size]
+        else:
+            raise ValueError("Invalid img_size")
+        self.input: str = args.input
 
 
 def main() -> int:
-    args = parse_args()
-
+    args = InferArgs()
     backends = DetectorInferBackends()
     # =============== Choose backend to Infer ===============
     # ------ Choose one and comment out the others ------
@@ -40,29 +55,28 @@ def main() -> int:
 
     detector.load_model(args.model, verbose=True)
 
-    with open(".cache/yolov5/coco.yaml", "r") as f:
-        label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)[
-            "names"
-        ]
-        label_list = list(label_map.values())
-        # print(label_list)
+    with open(args.config, "r") as f:
+        file_content = yaml.load(f, Loader=yaml.FullLoader)
+    label_map: Dict[int, str] = file_content["names"]
+    label_list = list(label_map.values())
 
     img = cv2.imread(args.input)  # H W C
     os.makedirs("tmp", exist_ok=True)
 
+    img_size = args.img_size
     # -- warm up
-    input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
+    input_t, scale_h, scale_w = Process.preprocess(img, img_size)  # B C H W
     output_t = detector.infer(input_t)
 
     # -- do inference
     print("-- do inference")
-    pbar = tqdm.tqdm(range(100))
+    pbar = tqdm.tqdm(range(10))
     total_sum_time = 0
     _cnt = 0
     for i in pbar:
         start_time = cv2.getTickCount()
         # -- preprocess
-        input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
+        input_t, scale_h, scale_w = Process.preprocess(img, img_size)  # B C H W
         # -- inference
         output_t = detector.infer(input_t)
         end_time = cv2.getTickCount()
