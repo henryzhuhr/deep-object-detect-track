@@ -32,7 +32,7 @@ class TrackArgs:
         parser.add_argument("-v", "--video", type=str, default=".cache/palace.mp4")
         parser.add_argument("-o", "--outdir", type=str, default="tmp")
         parser.add_argument("-m", "--model", type=str, default=".cache/yolov5/yolov5s_openvino_model/yolov5s.xml")
-        parser.add_argument("-c", "--config", type=str, default=".cache/yolov5/coco.yaml")
+        parser.add_argument("-c", "--dataset-config", type=str, default=".cache/yolov5/coco.yaml")
         parser.add_argument("-s", "--img-size", nargs="+", type=int, default=[640, 640])
         parser.add_argument("--aspect_ratio_thresh", type=float, default=1.6,
             help="threshold for filtering out boxes of which aspect ratio are above the given value." )
@@ -42,11 +42,10 @@ class TrackArgs:
 
     def __init__(self) -> None:
         args = self.get_args()
-
         self.video: str = args.video
         self.output_dir: str = args.outdir
         self.model_path: str = args.model
-        self.config: str = args.config
+        self.dataset_config: str = args.dataset_config
         if len(args.img_size) == 2:
             self.img_size: List[int] = args.img_size
         elif len(args.img_size) == 1:
@@ -84,7 +83,7 @@ def main():
     print("-- Available devices:", detector.query_device())
     detector.load_model(args.model_path, verbose=True)
 
-    with open(args.config, "r") as f:
+    with open(args.dataset_config, "r") as f:
         label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)[
             "names"
         ]

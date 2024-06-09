@@ -15,7 +15,7 @@ class InferArgs:
         parser = argparse.ArgumentParser(add_help=False)
         # fmt: off
         parser.add_argument("-m", "--model", type=str, default=".cache/yolov5/yolov5s.onnx")
-        parser.add_argument("-c", "--config", type=str, default=".cache/yolov5/coco.yaml")
+        parser.add_argument("-c", "--dataset-config", type=str, default=".cache/yolov5/coco.yaml")
         parser.add_argument("-s", "--img-size", nargs="+", type=int, default=[640, 640])
         parser.add_argument("-i", "--input", type=str, default="images/bus.jpg")
         # fmt: on
@@ -24,7 +24,7 @@ class InferArgs:
     def __init__(self) -> None:
         args = self.get_args()
         self.model: str = args.model
-        self.config: str = args.config
+        self.dataset_config: str = args.dataset_config
         if len(args.img_size) == 2:
             self.img_size: List[int] = args.img_size
         elif len(args.img_size) == 1:
@@ -55,7 +55,7 @@ def main() -> int:
 
     detector.load_model(args.model, verbose=True)
 
-    with open(args.config, "r") as f:
+    with open(args.dataset_config, "r") as f:
         file_content = yaml.load(f, Loader=yaml.FullLoader)
     label_map: Dict[int, str] = file_content["names"]
     label_list = list(label_map.values())

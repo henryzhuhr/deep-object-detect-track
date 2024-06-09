@@ -13,29 +13,18 @@ from utils.dataset.variables import SUPPORTED_IMAGE_TYPES
 import xml.etree.ElementTree as ET
 
 
-
 class AutoLabelArgs:
 
     @staticmethod
     def get_args():
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "-d", "--image-dir", type=str, default="~/data/drink.unlabel/cola"
-        )
-        parser.add_argument(
-            "-c",
-            "--dataset-config",
-            type=str,
-            default="~/data/drink-organized/dataset.yaml",
-        )
-        parser.add_argument(
-            "-m",
-            "--model",
-            type=str,
-            # default=".cache/yolov5/yolov5s.onnx",
-            default="temp/drink-yolov5x6/weights/best.onnx",
-        )
+        # fmt: off
+        parser.add_argument("-d", "--image-dir", type=str, default="~/data/drink.unlabel/cola")
+        parser.add_argument("-c", "--dataset-config", type=str, default="~/data/drink-organized/dataset.yaml")
+        parser.add_argument("-m", "--model", type=str, default="temp/drink-yolov5x6/weights/best.onnx")
+        parser.add_argument("-s", "--img-size", nargs="+", type=int, default=[640, 640])
         parser.add_argument("-t", "--conf-threshold", type=float, default=0.5)
+        # fmt: on
         return parser.parse_args()
 
     def __init__(self) -> None:
@@ -48,6 +37,12 @@ class AutoLabelArgs:
         if not os.path.exists(self.dataset_config_file): # check if the directory exists
             raise FileNotFoundError( f"Dataset configuration file not found: {self.dataset_config_file}")
         self.model: str = args.model
+        if len(args.img_size) == 2:
+            self.img_size: List[int] = args.img_size
+        elif len(args.img_size) == 1:
+            self.img_size: List[int] = [args.img_size, args.img_size]
+        else:
+            raise ValueError("Invalid img_size")
         self.conf_t: float = args.conf_threshold
         # fmt: on
 
@@ -84,6 +79,7 @@ def main():
     detector.load_model(args.model, verbose=True)
 
     image_dir = args.image_dir
+    img_size = args.img_size
 
     for file in os.listdir(image_dir):
         # 获取文件后缀，查看是否是图片文件
@@ -102,7 +98,7 @@ def main():
         # =============== Auto label ===============
         start_time = cv2.getTickCount()
         img = cv2.imread(os.path.join(image_dir, file))  # H W C
-        input_t, scale_h, scale_w = Process.preprocess(img)  # B C H W
+        input_t, scale_h, scale_w = Process.preprocess(img, img_size)  # B C H W
         output_t = detector.infer(input_t)
         preds = Process.postprocess(output_t)
         end_time = cv2.getTickCount()
