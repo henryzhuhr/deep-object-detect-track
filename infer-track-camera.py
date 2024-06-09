@@ -1,0 +1,215 @@
+import os
+import copy
+import time
+import argparse
+from typing import Dict, List
+
+import cv2
+import numpy as np
+import yaml
+
+from dlinfer.detector import DetectorInferBackends
+from dlinfer.detector import Process
+from dlinfer.tracker import ByteTracker
+
+
+class TTrackBbox:
+    def __init__(self, tlwh: np.ndarray, objid: int, score: np.float32, clsid: int) -> None:
+        self.tlwh = tlwh
+        self.objid = objid
+        self.score = score
+        self.clsid = clsid
+
+
+class TrackArgs:
+    def __init__(self) -> None:
+        args = self.get_args()
+
+        self.video: str = args.video
+        self.output_dir: str = args.outdir
+        self.model_path: str = args.model
+        self.aspect_ratio_thresh: float = args.aspect_ratio_thresh
+        self.min_box_area: float = args.min_box_area
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir, exist_ok=True)
+
+        if not os.path.exists(self.model_path):
+            raise FileNotFoundError(f"Model file {self.model_path} not found")
+
+    @staticmethod
+    def get_args():
+        parser = argparse.ArgumentParser()
+        # fmt: off
+        parser.add_argument("-v", "--video", type=str, default="0")  # 默认值改为“0”以使用摄像头
+        parser.add_argument("-o", "--outdir", type=str, default="tmp")
+        parser.add_argument("-m", "--model", type=str, default=".cache/exp3/weights/best_openvino_model/best.xml")
+        parser.add_argument("--aspect_ratio_thresh", type=float, default=1.6,
+            help="threshold for filtering out boxes of which aspect ratio are above the given value." )
+        parser.add_argument("--min_box_area", type=float, default=10, help="filter out tiny boxes")
+        # fmt: on
+        return parser.parse_args()
+
+
+def main():
+    args = TrackArgs()
+    video_source = int(args.video) if args.video.isdigit() else args.video
+    output_dir = args.output_dir
+
+    cap = cv2.VideoCapture(video_source)
+    # print(video_source)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv2.CAP_PROP_FPS) if cap.get(cv2.CAP_PROP_FPS) > 0 else 30
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) if video_source != 0 else float('inf')
+    frame_count_strlen = len(str(frame_count))
+
+    # Prepare video writer
+    output_video_path = os.path.join(output_dir, "output.mp4")
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Use 'mp4v' codec for .mp4 files
+    out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+
+    # Load detector / 加载检测器
+    backends = DetectorInferBackends()
+    detector = backends.OpenVINOBackend(device="GPU.0")
+    print("-- Available devices:", detector.query_device())
+    detector.load_model(args.model_path, verbose=True)
+
+    with open(".cache/dataset.yaml", "r") as f:
+        label_map: Dict[int, str] = yaml.load(f, Loader=yaml.FullLoader)["names"]
+        label_list = list(label_map.values())
+        print(label_list)
+
+    tracker = ByteTracker()
+
+    # (1, 3, 640, 640)
+    dummy_inputs = np.random.randn(1, 3, 1280, 1280).astype(np.float32)
+    output_t = detector.infer(dummy_inputs)
+
+    frame_id = 0
+    while True:
+        start_time = time.time()
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame_id += 1
+
+        start_time = time.time()
+        img = frame
+        debug_img = copy.deepcopy(frame)
+        copy_time = get_consume_t_ms(start_time)
+        start_time = time.time()
+
+        input_t, scale_h, scale_w = Process.preprocess(img,[1280,1280])
+        preprocess_time = get_consume_t_ms(start_time)
+        start_time = time.time()
+
+        output_t = detector.infer(input_t)
+        infer_time = get_consume_t_ms(start_time)
+        start_time = time.time()
+
+        preds = Process.postprocess(output_t)  # [ B, [x1, y1, x2, y2, conf, cls] ]
+        online_targets = tracker.update(preds, scale_h, scale_w)
+        online_tackbboxes: List[TTrackBbox] = []
+        for t in online_targets:
+            tlwh = t.tlwh
+            tid = t.track_id
+            tcls = t.clsid
+            vertical = tlwh[2] / tlwh[3] > args.aspect_ratio_thresh
+            if tlwh[2] * tlwh[3] > args.min_box_area and not vertical:
+                online_tackbboxes.append(TTrackBbox(tlwh, tid, t.score, tcls))
+
+        postprocess_time = get_consume_t_ms(start_time)
+
+        display_info = " ".join(
+            [
+                f"Frame {str(frame_id).rjust(frame_count_strlen)}/{frame_count}",
+                f"Copy: {copy_time:.2f}",
+                f"Preprocess: {preprocess_time:.2f}",
+                f"Infer: {infer_time:.2f}",
+                f"Postprocess: {postprocess_time:.2f}",
+                "(ms)",
+            ]
+        )
+
+        print(display_info)
+        display_info = " ".join(
+            [
+                f"Frame {str(frame_id).rjust(frame_count_strlen)}/{frame_count}",
+                f"Time: {preprocess_time+infer_time+postprocess_time:.2f}(ms)",
+            ]
+        )
+
+        online_im = plot_tracking(
+            debug_img,
+            online_tackbboxes,
+            label_list,
+            display_info=display_info,
+        )
+
+        # Write frame to output video
+        out.write(online_im)
+
+        # Display the resulting frame
+        cv2.imshow('Inference', online_im)
+
+        # Break the loop on 'q' key press
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+
+
+def get_consume_t_ms(start_time: float):
+    return (time.time() - start_time) * 1000
+
+
+def get_color(idx):
+    idx = idx * 3
+    color = ((37 * idx) % 255, (17 * idx) % 255, (29 * idx) % 255)
+
+    return color
+
+
+def plot_tracking(
+    img: np.ndarray,
+    tackbboxes: List[TTrackBbox],
+    label_list: List[str],
+    ids2=None,
+    display_info: str = "",
+):
+    img = np.ascontiguousarray(np.copy(img))
+    img_h, img_w = img.shape[:2]
+
+    top_view = np.zeros([img_w, img_w, 3], dtype=np.uint8) + 255
+    text_scale = 1.5
+    text_thickness = 2
+    line_thickness = 2
+    radius = max(5, int(img_w / 140.0))
+
+    cv2.putText(img, display_info, (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), thickness=2)
+
+    for i, tackbbox in enumerate(tackbboxes):
+        x1, y1, w, h = tackbbox.tlwh
+        intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
+        obj_id = int(tackbbox.objid)
+        id_text = f"{label_list[tackbbox.clsid]}/{int(obj_id)} ({tackbbox.score:.2f})"
+        color = get_color(abs(obj_id))
+        cv2.rectangle(img, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
+        cv2.putText(
+            img,
+            id_text,
+            (intbox[0], intbox[1] - 10),
+            cv2.FONT_HERSHEY_PLAIN,
+            text_scale,
+            (0, 0, 255),
+            thickness=text_thickness,
+        )
+
+    return img
+
+
+if __name__ == "__main__":
+    main()
