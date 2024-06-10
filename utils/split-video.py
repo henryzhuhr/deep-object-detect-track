@@ -16,6 +16,7 @@ class TrackArgs:
         parser.add_argument("-v", "--video", type=str)    
         parser.add_argument("-o", "--outdir", type=str, default=None)
         parser.add_argument("-r", "--spilt-fps", type=int, default=10)
+        parser.add_argument("-s", "--max-size", type=int, default=1080)
         # fmt: on
 
         return parser.parse_args()
