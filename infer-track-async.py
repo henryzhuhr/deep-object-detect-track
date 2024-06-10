@@ -78,9 +78,9 @@ def main():
     frame_count_strlen = len(str(frame_count))
 
     # Load detector / 加载检测器
-    backends = DetectorInferBackends()
-    detector = backends.OpenVINOBackend(device="AUTO")
-    print("-- Available devices:", detector.query_device())
+    ovbackend = DetectorInferBackends().OpenVINOBackend
+    print("-- Available devices:", ovbackend.query_device())
+    detector = ovbackend(device="AUTO")
     detector.load_model(args.model_path, verbose=True)
 
     with open(args.dataset_config, "r") as f:
@@ -91,11 +91,22 @@ def main():
         print(label_list)
 
     tracker = ByteTracker()
-
-    # (1, 3, 640, 640)
     img_size = args.img_size
-    dummy_inputs = np.random.randn(1, 3, *img_size).astype(np.float32)
-    output_t = detector.infer(dummy_inputs)
+
+    async_preds = None
+
+    def async_completion_callback(infer_request, info):
+        global async_preds
+        # input: np.ndarray = info
+        print(info)
+        start_time = info["start_time"]
+        infer_time = get_consume_t_ms(start_time)
+        async_preds = infer_request.get_output_tensor(0).data[0]
+        print(f"Async infer completed in {infer_time:.2f} ms")
+
+        # TODO: postprocess
+
+    detector.enable_async_mode_infer(async_completion_callback)
 
     frame_id = 0
     while True:
@@ -117,13 +128,22 @@ def main():
         preprocess_time = get_consume_t_ms(start_time)
         start_time = time.time()
 
-        output_t = detector.infer(input_t)
+        detector.infer_async(
+            input_t,
+            **dict(
+                start_time=start_time,
+                frame_id=frame_id,
+            ),
+        )
+        continue
+
         infer_time = get_consume_t_ms(start_time)
         start_time = time.time()
 
         preds = Process.postprocess(
             output_t
         )  # [ B, [x1, y1, x2, y2, conf, cls] ]
+
         online_targets = tracker.update(preds, scale_h, scale_w)
         online_tackbboxes: List[TTrackBbox] = []
         for t in online_targets:
@@ -165,7 +185,7 @@ def main():
         # Process.mark(debug_img, preds, label_list, scale_h, scale_w)
 
         cv2.imwrite(f"{output_dir}/out.jpg", online_im)
-        # cv2.imshow("frame", debug_img)
+        # cv2.imshow("frame", online_im)
         # cv2.waitKey(10)
     cv2.destroyAllWindows()
 

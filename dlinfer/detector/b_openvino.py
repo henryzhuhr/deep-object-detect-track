@@ -1,6 +1,7 @@
-from typing import List
+import time
 from .interface import IDetectoBackends
 import numpy as np
+import openvino as ov
 from openvino.preprocess import PrePostProcessor
 from openvino.runtime import (
     __version__,
@@ -25,6 +26,11 @@ class OpenVINODetectorBackend(IDetectoBackends):
         self.core: Core = Core()
         self.device = device
         self.model: CompiledModel = None
+        self.infer_request = None
+        self.async_mode = False
+        self.curr_request = None
+        self.next_request = None
+        # TODO： [Multi-device execution](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/multi-device.html)
 
     def load_model(self, model_path: str, verbose: bool = False) -> None:
         # fmt: off
@@ -33,6 +39,7 @@ class OpenVINODetectorBackend(IDetectoBackends):
         assert len(model.outputs) == 1, "Sample supports only single output topologies"
         
         # -- Apply preprocessing
+        # https://docs.openvino.ai/2024/openvino-workflow/running-inference/optimize-inference/optimize-preprocessing.html
         ppp = PrePostProcessor(model)
 
         # 1) Set input tensor information:
@@ -56,7 +63,17 @@ class OpenVINODetectorBackend(IDetectoBackends):
         # -- Loading model to the device
         compiled_model = self.core.compile_model(model, self.device)
         self.model = compiled_model
+        self.infer_request = compiled_model.create_infer_request()
+        self.input_layer_ir = model.input(0)
         # fmt: on
+
+    def enable_async_mode_infer(self, completion_callback):
+        infer_queue = AsyncInferQueue(
+            self.model, jobs=2
+        )  # API: https://docs.openvino.ai/2024/api/ie_python_api/_autosummary/openvino.runtime.AsyncInferQueue.html
+        infer_queue.set_callback(completion_callback)
+        self.infer_queue = infer_queue
+        self.async_mode = True
 
     def infer(self, input: np.ndarray) -> np.ndarray:
         """
@@ -72,11 +89,30 @@ class OpenVINODetectorBackend(IDetectoBackends):
         # outputs: List[np.ndarray] = self.ort_session.run(["output"], {"input": input})
         # output = outputs[0]
         # return output
-        results = self.model.infer_new_request({0: input})
-        preds = next(iter(results.values()))
+        input_layer_ir = self.input_layer_ir
+        infer_request = self.infer_request
+        infer_request.set_tensor(input_layer_ir, ov.Tensor(input))
+        infer_request.infer()
+        preds = infer_request.get_output_tensor(0).data
         return preds
+
+    def infer_async(self, input: np.ndarray, **kwargs) -> np.ndarray:
+        """
+        https://docs.openvino.ai/2024/openvino-workflow/running-inference/integrate-openvino-with-your-application/inference-request.html#asynchronous-mode
+        """
+        infer_queue = self.infer_queue
+        input_layer_ir = self.input_layer_ir
+        infer_queue.start_async(
+            {input_layer_ir.any_name: input},
+            (kwargs),
+        )
 
     @staticmethod
     def query_device():
         """Query available devices for OpenVINO backend."""
         return Core().available_devices
+
+
+# input_layer_ir = model.input(0)
+# N, C, H, W = input_layer_ir.shape
+# shape = (H, W)

@@ -28,7 +28,7 @@ class InferArgs:
         if len(args.img_size) == 2:
             self.img_size: List[int] = args.img_size
         elif len(args.img_size) == 1:
-            self.img_size: List[int] = [args.img_size, args.img_size]
+            self.img_size: List[int] = args.img_size * 2
         else:
             raise ValueError("Invalid img_size")
         self.input: str = args.input
