@@ -23,16 +23,18 @@ class DatasetProcessArgs:
         if self.datadir[-1] == "/" or self.datadir[-1] == "\\":
             self.datadir = self.datadir[:-1]
 
-        # check if the directory exists
-        if not os.path.exists(self.datadir):
+        if not os.path.exists(self.datadir):  # check if the directory exists
             raise FileNotFoundError(
                 f"Directory '{self.datadir}' not found, check '--datadir {args.datadir}'"
             )
 
-        self.savedir: str = os.path.expandvars(os.path.expanduser(args.savedir))
-        if self.savedir is None:
+        if args.savedir is None:
             self.savedir: str = f"{self.datadir}-organized"
             print(f"Save directory is not specified, save to '{self.savedir}'")
+        else:
+            self.savedir: str = os.path.expandvars(
+                os.path.expanduser(args.savedir)
+            )
 
 
 def main():
