@@ -8,3 +8,8 @@
 pnpm install
 pnpm docs:dev
 ```
+
+
+## License
+
+deep-object-detect-track is [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) licensed, see the [LICENSE](LICENSE) file for details.
