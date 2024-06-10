@@ -11,10 +11,11 @@ source scripts/base.sh
 # -- Yolov5 project path / 项目路径
 yolov5_path=$PROJECT_HOME/projects/yolov5
 
-DATASET_CONFIG=$yolov5_path/data/coco128.yaml
+DATASET_CONFIG=$yolov5_path/data/coco.yaml
 
 # -- Path to exported model / 需要导出模型的路径
 EXPORTED_MODEL_PATH=$PROJECT_HOME/.cache/yolov5/yolov5s.pt
+IMG_SIZE=640
 
 # -- 导出 TensorRT 的参数
 # 如果是单卡 设置为 0
@@ -33,16 +34,12 @@ cd $yolov5_path
 python3 export.py \
     --weights $EXPORTED_MODEL_PATH \
     --data $DATASET_CONFIG \
-    --simplify --include onnx 
-
-
-python3 export.py \
-    --weights $EXPORTED_MODEL_PATH \
-    --data $DATASET_CONFIG \
+    --img-size $IMG_SIZE \
     --simplify --include openvino 
 
 
-python3 export.py \
-    --weights $EXPORTED_MODEL_PATH \
-    --data $DATASET_CONFIG \
-    --simplify --include engine --device $TRT_EXPORTED_DEVICE
+# python3 export.py \
+#     --weights $EXPORTED_MODEL_PATH \
+#     --data $DATASET_CONFIG \
+#     --img-size $IMG_SIZE \
+#     --simplify --include engine --device $TRT_EXPORTED_DEVICE
