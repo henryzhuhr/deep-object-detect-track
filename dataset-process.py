@@ -11,9 +11,10 @@ class DatasetProcessArgs:
     @staticmethod
     def get_args():
         parser = argparse.ArgumentParser()
-        parser.add_argument(
-            "-d", "--datadir", type=str, default="~/data/drink/"
-        )
+        # fmt: off
+        parser.add_argument("-d", "--datadir", type=str, default="~/data/drink", help="Directory of the dataset")
+        parser.add_argument("-s", "--savedir", type=str, default=None, help="Directory to save the organized dataset, default is '<datadir>-organized'")
+        # fmt: on
         return parser.parse_args()
 
     def __init__(self) -> None:
@@ -28,6 +29,11 @@ class DatasetProcessArgs:
                 f"Directory '{self.datadir}' not found, check '--datadir {args.datadir}'"
             )
 
+        self.savedir: str = os.path.expandvars(os.path.expanduser(args.savedir))
+        if self.savedir is None:
+            self.savedir: str = f"{self.datadir}-organized"
+            print(f"Save directory is not specified, save to '{self.savedir}'")
+
 
 def main():
     args = DatasetProcessArgs()
@@ -36,7 +42,7 @@ def main():
     label_file_list = get_all_label_files(args.datadir)
 
     # -- organize the dataset into a new directory
-    organized_datadir = f"{args.datadir}-organized"
+    organized_datadir = args.savedir
     if not os.path.exists(organized_datadir):
         os.makedirs(organized_datadir, exist_ok=False)
     else:
