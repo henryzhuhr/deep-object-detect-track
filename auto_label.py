@@ -40,7 +40,7 @@ class AutoLabelArgs:
         if len(args.img_size) == 2:
             self.img_size: List[int] = args.img_size
         elif len(args.img_size) == 1:
-            self.img_size: List[int] = [args.img_size, args.img_size]
+            self.img_size: List[int] = args.img_size*2
         else:
             raise ValueError("Invalid img_size")
         self.conf_t: float = args.conf_threshold
@@ -68,12 +68,12 @@ def main():
     # )
 
     ## ------ OpenVINO ------
-    ov_backend = backends.OpenVINOBackend
-    print("-- Available devices:", ov_backend.query_device())
-    detector = ov_backend(device="AUTO")
+    # ov_backend = backends.OpenVINOBackend
+    # print("-- Available devices:", ov_backend.query_device())
+    # detector = ov_backend(device="AUTO")
 
     ## ------ TensorRT ------
-    # detector = backends.TensorRTBackend()
+    detector = backends.TensorRTBackend()
 
     # =======================================================
     detector.load_model(args.model, verbose=True)

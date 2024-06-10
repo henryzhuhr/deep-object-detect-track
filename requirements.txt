@@ -22,7 +22,7 @@ openvino==2024.1.0
 
 # tensorrt
 tensorrt==10.0.1
-cuda-python==12.1.0
+cuda-python==12.5.0
 
 
 
