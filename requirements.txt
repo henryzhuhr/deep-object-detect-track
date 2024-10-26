@@ -1,11 +1,11 @@
---index-url https://download.pytorch.org/whl/cu121
+--index-url https://download.pytorch.org/whl/cu124
 --extra-index-url https://download.pytorch.org/whl/cpu
 --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple
 --extra-index-url https://pypi.org/simple
 
 # ====== pytorch ======
-torch==2.3.1 
-torchvision==0.18.1
+torch==2.5.0
+torchvision==0.20.0
 
 # ====== yolov5 dependencies ======
 opencv-python
