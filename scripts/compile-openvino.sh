@@ -1,5 +1,7 @@
+#!/bin/bash
+
 export OpenVINO_HOME="$HOME/program/openvino-2023_release"
-source $OpenVINO_HOME/setupvars.sh
+source "$OpenVINO_HOME"/setupvars.sh
 
 BUILD_DIR="build"
 
@@ -7,18 +9,18 @@ if [ ! -d "$BUILD_DIR" ]; then
     mkdir -p "$BUILD_DIR"
 fi
 
-cd "$BUILD_DIR"
+cd "$BUILD_DIR" || exit
 rm CMakeCache.txt
 cmake .. -G Ninja
 
 if [ "$(uname)" = "Darwin" ]; then
-    NUM_CORES=`sysctl -n hw.ncpu`
+    NUM_CORES=$(sysctl -n hw.ncpu)
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-    NUM_CORES=`nproc --all`
+    NUM_CORES=$(nproc --all)
 else
     NUM_CORES=4
 fi
 
-ninja -j $NUM_CORES
+ninja -j "$NUM_CORES"
 
 ./infer

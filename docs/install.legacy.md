@@ -7,7 +7,6 @@ outline: deep
 
 # 安装环境
 
-
 ## 获取代码
 
 ::: code-group
@@ -47,13 +46,12 @@ git clone https://github.com/ultralytics/yolov5.git projects/yolov5
 
 :::
 
-
 ## 系统要求
 
 ### 操作系统
 
-
 项目在 Linux(Ubuntu) 和 MacOS 系统并经过测试 ，经过测试的系统：
+
 - ✅ Ubuntu 22.04 jammy (CPU & GPU)
 - ✅ MacOS (CPU)
 
@@ -78,7 +76,6 @@ export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 > 事实上，Pytorch 1.8 开始就会在安装的时候自动安装对应的 CUDA Toolkit，因此不需要手动安装 CUDA Toolkit，因此可以跳过这一步
 
 MacOS 系统不支持 CUDA Toolkit，可以使用 CPU 训练模型 (Yolov5 项目暂不支持 MPS 训练)，但是推理过程可以使用 Metal ，参考 [*Introducing Accelerated PyTorch Training on Mac*](https://pytorch.org/blog/introducing-accelerated-pytorch-training-on-mac/#getting-started) 和 [*MPS backend*](https://pytorch.org/docs/stable/notes/mps.html#mps-backend)
-
 
 ## 安装环境
 
@@ -115,7 +112,7 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
 zsh Miniconda3-latest-MacOSX-arm64.sh
 ```
 
-::: 
+:::
 
 ### 方法一：手动安装
 
@@ -127,7 +124,7 @@ zsh Miniconda3-latest-MacOSX-arm64.sh
 conda create -p .env/deep-object-detect-track python=3.10 -y
 conda activate ./.env/deep-object-detect-track
 ```
-    
+
 ```shell [全局安装环境]
 conda create -n deep-object-detect-track python=3.10 -y
 conda activate deep-object-detect-track
@@ -137,29 +134,30 @@ conda activate deep-object-detect-track
 
 > Python 版本选择 3.10 是因为 Ubuntu 22.04 默认安装的 Python 版本是 3.10
 
-
 - 如果电脑有 NVIDIA GPU，可以直接安装 [PyTorch](https://pytorch.org/get-started/locally/) 和其他依赖
+
 ```shell
 pip install -r requirements.txt
 ```
 
 - 如果电脑没有 NVIDIA GPU，可以安装 CPU 版本的 PyTorch
+
 ```shell
 pip install -r requirements/requirements-cpu.txt
 ```
 
-
 ### 方法二：使用提供的脚本
 
-提供的安装脚本依赖于基本环境变量 `scripts/variables.sh` ，可以复制一份到项目目录下进行自定义修改（推荐），如果不需要修改，可以直接执行
+提供的安装脚本依赖于基本环境变量 `scripts/variables.bash` ，可以复制一份到项目目录下进行自定义修改（推荐），如果不需要修改，可以直接执行
 
 ```shell
-cp scripts/variables.sh scripts/variables.custom.sh
+cp scripts/variables.bash scripts/variables.custom.sh
 ```
+
 - `CACHE_DIR`: 用于存放一些缓存文件，例如 `yolov5/requirements.txt`，默认为项目目录下的 `.cache`
 - 安装过程会自动检测 `CUDA_VERSION` 以安装对应的 PyTorch 版本，否则默认安装 CPU 版本的 PyTorch；如果电脑有 NVIDIA GPU 但是不想安装 CUDA Toolkit 到全局系统（需要 sudo）可以取消注释 `export CUDA_VERSION=12.1` 以安装对应的 PyTorch 版本
 
-运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.sh` 
+运行会自动检测是否存在用户自定义的环境变量 `scripts/variables.custom.sh` ，如果存在则使用自定义的环境变量，否则使用默认的环境变量 `scripts/variables.bash`
 
 执行命令自动创建并且激活虚拟环境，默认使用 `venv`，**可以重复执行该脚本获取激活环境的提示信息或者安装依赖**
 
@@ -176,4 +174,3 @@ bash scripts/create-python-env.sh -e conda -i # -i 自动安装依赖
 ```
 
 :::
-

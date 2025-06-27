@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ~/.bashrc
 
 ENV_PATH=".env/deploy-trt_10_0.venv"

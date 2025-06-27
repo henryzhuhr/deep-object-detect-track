@@ -1,6 +1,6 @@
 
 if [ -z $ENV_PATH ]; then
-    print_error "ENV_PATH is not set. Please set it in 'scripts/base.sh'"
+    print_error "ENV_PATH is not set. Please set it in 'scripts/base.bash'"
     exit 1
 fi
 

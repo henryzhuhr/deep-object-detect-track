@@ -1,8 +1,10 @@
-if [ ! -f "scripts/base.sh" ]; then
-    echo "scripts/base.sh not found"
+#!/bin/bash
+
+if [ ! -f "scripts/base.bash" ]; then
+    echo "scripts/base.bash not found"
     exit 1
 fi
-source scripts/base.sh
+source scripts/base.bash
 
 
 # =============== Set Device ================

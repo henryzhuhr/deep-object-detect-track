@@ -1,3 +1,5 @@
+#!/bin/bash
+
 source ~/.bashrc
 
 ENV_PATH=".env/deploy-trt_8_6.venv"

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 video_list=(
     "~/data/medicinebox_dataset/videos/240609_in_1.mp4"
