@@ -1,12 +1,11 @@
 {
   "name": "@henryzhuhr/deep-object-detect-track",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta2",
   "description": "A deep learning deployment project to detect and track objects in videos",
   "main": "index.js",
   "scripts": {
     "docs:dev": "vitepress dev docs --host",
     "docs:build": "vitepress build docs",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "docs:preview": "vitepress preview docs"
   },
   "keywords": [
@@ -18,21 +17,22 @@
     "openivino",
     "yolov5"
   ],
-  "author": "HenryZhuHR <henryzhuhr@gmail.com>",
+  "author": "henryzhuhr <henryzhuhr@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git@github.com:HenryZhuHR/deep-object-detect-track.git"
+    "url": "git@github.com:henryzhuhr/deep-object-detect-track.git"
   },
   "private": true,
-  "license": "GPL-3.0",
-  "bugs": "https://github.com/HenryZhuHR/deep-object-detect-track/issues",
+  "license": "Apache-2.0",
+  "bugs": "https://github.com/henryzhuhr/deep-object-detect-track/issues",
   "devDependencies": {
-    "@vuepress/client": "2.0.0-rc.0",
-    "@vuepress/markdown": "2.0.0-rc.0",
-    "@vuepress/theme-default": "2.0.0-rc.0",
+    "@mdit-vue/shared": "^2.1.4",
     "markdown-it-mathjax3": "^4.3.2",
-    "vitepress": "^1.1.4",
-    "vue": "^3.4.3",
-    "vuepress": "2.0.0-rc.0"
+    "medium-zoom": "^1.1.0",
+    "sass": "^1.89.2",
+    "transliteration": "^2.3.5",
+    "uslug": "^1.0.4",
+    "vitepress": "^1.6.3",
+    "vue": "^3.5.17"
   }
 }
