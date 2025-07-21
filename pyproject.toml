@@ -1,2 +1,96 @@
-[tool.black]
-line-length = 100
+[project]
+name = "deep-object-detect-track"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    {name = "henryzhuhr", email = "henryzhuhr@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+# https://peps.python.org/pep-0508/?spm=a2ty_o01.29997173.0.0.39f4c921Cyd4mh
+# uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+
+# Required dependencies ------------------------------------------------------------------------------------------------
+dependencies = [
+    # Linux users (x86_64, no aarch64)
+    "torch>=2.0.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
+    "torchaudio>=2.0.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
+    "torchvision>=0.15.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
+    # macOS users
+    # "torch>=2.6.0; sys_platform == 'darwin'",
+    # "torchaudio>=2.6.0; sys_platform == 'darwin'",
+    # "torchvision>=0.21.0; sys_platform == 'darwin'",
+    # ======
+    # common
+    # ======
+    "opencv-python>=4.8.0; platform_machine != 'aarch64' and 'tegra' not in platform_release", # Jetson 设备请使用系统自带或编译
+    "pyyaml>=6.0.2",
+    "loguru>=0.7.3",
+    # "tensorrt>=10.12.0.36; sys_platform == 'linux' and platform_machine == 'x86_64'",
+    # "nvidia-tensorrt; sys_platform == 'linux' and platform_machine == 'aarch64'",
+    # uv pip install pip setuptools && uv pip install tensorrt --no-build-isolation-package tensorrt
+    "numpy<2", # "numpy==1.26.0",
+    # https://pypi.org/project/tensorrt-stubs/
+    # "tensorrt-stubs; sys_platform != 'darwin' or (platform_machine != 'aarch64' and 'tegra' not in platform_release)", # Jetson 设备请使用系统自带或编译
+    "cuda-python",
+]
+
+
+# Optional dependencies ------------------------------------------------------------------------------------------------
+[project.optional-dependencies]
+export = [
+    "ultralytics",
+    "onnx>=1.12.0,<1.18.0", # ONNX export
+    'onnxslim>=0.1.56', 
+    'onnxruntime'
+]
+dev = [
+    "pybind11-stubgen>=2.5.4",
+    "mypy>=1.17.0",
+]
+
+[[tool.uv.index]]
+url = "https://mirrors.cloud.tencent.com/pypi/simple/"
+default = true
+
+# CUDA 构建源（仅限 Linux x86_64）
+[[tool.uv.index]]
+name = "pytorch-cuda"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+# CPU/MPS 构建源（用于 macOS）
+[[tool.uv.index]]
+name = "pytorch-macos"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# 根据平台选择不同源: https://docs.astral.sh/uv/concepts/indexes/#pinning-a-package-to-an-index
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
+    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+]
+torchaudio = [
+    { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
+    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+]
+torchvision = [
+    { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
+    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+]
+
+
+[tool.uv]
+python-preference = "system"
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
+# https://docs.astral.sh/uv/reference/settings/#python-preference
+
+
+[tool.uv.pip]
+torch-backend = "auto"
+
+[tool.mypy]
+follow_imports = "silent"
+show_error_codes = true
+stub_dirs = ["stubs"]

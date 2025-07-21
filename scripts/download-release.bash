@@ -11,17 +11,17 @@ base_url=https://github.com/HenryZhuHR/deep-object-detect-track/releases/downloa
 
 
 weights_dir=$CACHE_DIR/yolov5
-[ ! -d ${weights_dir} ] && mkdir -p ${weights_dir}
+[ ! -d "${weights_dir}" ] && mkdir -p "${weights_dir}"
 
-wget -c ${base_url}/coco.yaml -P ${weights_dir}
-wget -c ${base_url}/yolov5s.onnx -P ${weights_dir}
+wget -c ${base_url}/coco.yaml -P "${weights_dir}"
+wget -c ${base_url}/yolov5s.onnx -P "${weights_dir}"
 
 
-ov_dir=${weights_dir}/yolov5s_openvino_model
-[ ! -d ${ov_dir} ] && mkdir -p ${ov_dir}
+ov_dir="${weights_dir}/yolov5s_openvino_model"
+[ ! -d "${ov_dir}" ] && mkdir -p "${ov_dir}"
 
-wget -c ${base_url}/yolov5s.bin -P ${ov_dir}
-wget -c ${base_url}/yolov5s.xml -P ${ov_dir}
+wget -c "${base_url}/yolov5s.bin" -P "${ov_dir}"
+wget -c "${base_url}/yolov5s.xml" -P "${ov_dir}"
 
 drink_dir=$CACHE_DIR/yolov5_drink
 [ ! -d ${drink_dir} ] && mkdir -p ${drink_dir}

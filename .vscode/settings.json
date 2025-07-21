@@ -16,6 +16,9 @@
     ],
     "python.analysis.autoImportCompletions": true,
     "python.analysis.extraPaths": [
-        "/opt/intel/openvino_2024/python"
-    ]
+        "/opt/intel/openvino_2024/python",
+        "/usr/lib/python3.10/dist-packages",// for jetpack
+        "./stubs", // trt 类型提示
+    ],
+   "python.analysis.typeCheckingMode": "basic"
 }

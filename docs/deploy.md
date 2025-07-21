@@ -280,7 +280,25 @@ pip install nvidia-cudnn-cu12==8.9.2.26
 ```
  
 
- 
+#### Jetson Nano 部署
+
+查看 Jetpack 版本
+```bash
+cat /etc/nv_tegra_release
+# R32 (release), REVISION: 4.4, GCID: 23942405, BOARD: t210ref, EABI: aarch64, DATE: Fri Oct 16 19:44:43 UTC 2020
+```
+
+也可以通过 `jtop` 的 `6INFO` 中查看具体的版本，例如 `L4T 32.4.4`
+
+
+然后在 [JetPack Archive](https://developer.nvidia.com/embedded/jetpack-archive) 检索版本
+
+根据 [Introduction to NVIDIA JetPack SDK](https://docs.nvidia.com/jetson/archives/jetpack-archived/jetpack-44/introduction/index.html) 可以检查系统中下面目录
+
+| JetPack Component | locations on reference filesystem|
+|--|--|
+|TensorRT| `/usr/src/tensorrt/bin/trtexec `|
+
 #### TensorRT 推理
 
 在 Yolov5 项目目录下执行

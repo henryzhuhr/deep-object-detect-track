@@ -50,7 +50,7 @@ def main() -> int:
     detector = ov_backend(device="AUTO")
 
     ## ------ TensorRT ------
-    # detector = backends.TensorRTBackend()
+    detector = backends.TensorRTBackend()
     # =======================================================
 
     detector.load_model(args.model, verbose=True)

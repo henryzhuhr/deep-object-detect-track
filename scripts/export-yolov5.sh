@@ -10,7 +10,7 @@ source scripts/base.bash
 # =============== Set Training Variables ================
 
 # -- Yolov5 project path / 项目路径
-yolov5_path=$PROJECT_HOME/projects/yolov5
+yolov5_path=$PROJECT_HOME/project/yolov5
 
 DATASET_CONFIG=$yolov5_path/data/coco.yaml
 
@@ -30,17 +30,24 @@ TRT_EXPORTED_DEVICE="0,1" # Multiple GPUs
 
 # =======================================================
 
-cd $yolov5_path
+if [ ! -d "$yolov5_path" ]; then
+    log_error "yolov5 project not found in '$yolov5_path'"
+    exit 1
+fi
 
-python3 export.py \
-    --weights $EXPORTED_MODEL_PATH \
-    --data $DATASET_CONFIG \
+cd "$yolov5_path" || exit
+
+uv sync
+
+uv run export.py \
+    --weights "$EXPORTED_MODEL_PATH" \
+    --data "$DATASET_CONFIG" \
     --img-size $IMG_SIZE \
     --simplify --include openvino 
 
 
-# python3 export.py \
-#     --weights $EXPORTED_MODEL_PATH \
-#     --data $DATASET_CONFIG \
-#     --img-size $IMG_SIZE \
-#     --simplify --include engine --device $TRT_EXPORTED_DEVICE
+uv run export.py \
+    --weights "$EXPORTED_MODEL_PATH" \
+    --data "$DATASET_CONFIG" \
+    --img-size $IMG_SIZE \
+    --simplify --include engine --device $TRT_EXPORTED_DEVICE

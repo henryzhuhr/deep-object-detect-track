@@ -17,6 +17,7 @@ export default defineConfig({
           { text: '数据集制作', link: '/dataset' },
           { text: '模型训练', link: '/train' },
           { text: '模型部署', link: '/deploy' },
+          { text: 'yolov11', link: '/yolov11' },
         ]
       }
     ],
@@ -29,6 +30,7 @@ export default defineConfig({
           { text: '数据集制作', link: '/dataset' },
           { text: '模型训练', link: '/train' },
           { text: '模型部署', link: '/deploy' },
+          { text: 'yolov11', link: '/yolov11' },
         ]
       }
     ],
@@ -62,7 +64,7 @@ export default defineConfig({
   },
   lastUpdated: true,
   markdown: {
-    math: true,
+    math: true, // https://vitepress.dev/zh/guide/markdown#math-equations
     lineNumbers: false
   }
 })

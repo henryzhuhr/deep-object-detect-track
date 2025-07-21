@@ -17,7 +17,7 @@ export ENV_PATH=$BASE_ENV_PATH/.env/$ENV_NAME
 
 
 # ================== Project Variables ==================
-export CACHE_DIR=$PROJECT_HOME/.cache
+export CACHE_DIR="${HOME}/.cache"
 
 
 # ================== Python Variables ==================

@@ -4,8 +4,8 @@
   "description": "A deep learning deployment project to detect and track objects in videos",
   "main": "index.js",
   "scripts": {
-    "docs:dev": "vitepress dev docs --host",
-    "docs:build": "vitepress build docs",
+    "docs:dev": "pnpm i && vitepress dev docs --host",
+    "docs:build": "pnpm i && vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
   "keywords": [

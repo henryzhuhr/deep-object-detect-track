@@ -22,6 +22,7 @@ function log_tip      { log_base "$YELLOW"  "TIP"       "$1"; }
 function log_success  { log_base "$GREEN"   "SUCCESS"   "$1"; }
 function log_warning  { log_base "$YELLOW"  "WARNING"   "$1"; }
 function log_error    { log_base "$RED"     "ERROR"     "$1"; }
+function log_fatal    { log_base "$RED"     "ERROR"     "$1"; exit 1; }
 
 function run_script {
     if [ ! -f "$1" ]; then
