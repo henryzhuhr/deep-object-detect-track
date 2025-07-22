@@ -8,25 +8,25 @@ DEFAULT_NAME = "IDetector"
 
 
 class IDetector(ABC):
-    NAME = DEFAULT_NAME
+    name = DEFAULT_NAME
     """name of inference backend, must be rewritten in subclass for checking"""
 
-    SUPPORTED_VERISONS: List[str] = []
+    supported_version: List[str] = []
     """supported versions of inference backend, must be rewritten in subclass for checking version"""
 
-    SUPPORTED_DEVICES: List[str] = []
+    supported_devices: List[str] = []
     """supported devices of inference backend, must be rewritten in subclass for checking device"""
 
     def __init__(self, version: str) -> None:
         super().__init__()
-        if self.NAME == DEFAULT_NAME:
+        if self.name == DEFAULT_NAME:
             raise NotImplementedError("NAME must be rewritten in subclass")
 
-        if len(self.SUPPORTED_VERISONS) < 1:
+        if len(self.supported_version) < 1:
             logger.warning("SUPPORTED_VERISONS must be rewritten in subclass")
 
-        if len(self.SUPPORTED_DEVICES) < 1:
-            logger.warning("SUPPORTED_DEVICES must be rewritten in subclass")
+        if len(self.supported_devices) < 1:
+            logger.warning("'supported_devices' must be rewritten in subclass")
 
         self._check_version(version)
 
@@ -35,12 +35,12 @@ class IDetector(ABC):
         Check if the version of inference backend is supported
         :param version: version of inference backend
         """
-        for sv in self.SUPPORTED_VERISONS:
+        for sv in self.supported_version:
             if version.startswith(sv):
                 return
         logger.warning(
-            f"{self.NAME} version {version} is not supported, "
-            f"please upgrade to support version: {self.SUPPORTED_VERISONS}"
+            f"{self.name} version {version} is not supported, "
+            f"please upgrade to support version: {self.supported_version}"
         )
 
     @abstractmethod

@@ -38,15 +38,15 @@ dependencies = [
 
 # Optional dependencies ------------------------------------------------------------------------------------------------
 [project.optional-dependencies]
-export = [
+dev = [
     "ultralytics",
     "onnx>=1.12.0,<1.18.0", # ONNX export
     'onnxslim>=0.1.56', 
-    'onnxruntime'
-]
-dev = [
+    'onnxruntime',
+
     "pybind11-stubgen>=2.5.4",
     "mypy>=1.17.0",
+    "opencv-python>=4.8.0"
 ]
 
 [[tool.uv.index]]
