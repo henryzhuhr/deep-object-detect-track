@@ -19,7 +19,7 @@ label_list = [
 ]
 
 
-def main():
+def main() -> None:
     detector = TensorRTDetectorV10()
     detector.load_model("~/.cache/ultralytics/yolo11n.engine", verbose=True)
 
