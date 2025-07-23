@@ -6,16 +6,16 @@ authors = [
     {name = "henryzhuhr", email = "henryzhuhr@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 # https://peps.python.org/pep-0508/?spm=a2ty_o01.29997173.0.0.39f4c921Cyd4mh
 # uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+
 
 # Required dependencies ------------------------------------------------------------------------------------------------
 dependencies = [
     # Linux users (x86_64, no aarch64)
-    "torch>=2.0.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
-    "torchaudio>=2.0.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
-    "torchvision>=0.15.0; platform_machine != 'aarch64' and 'tegra' not in platform_release",
+    "torch>=2.0.0; platform_machine == 'aarch64' and 'tegra' in platform_release",
+    "torchvision>=0.15.0; platform_machine == 'aarch64' and 'tegra' in platform_release",
     # macOS users
     # "torch>=2.6.0; sys_platform == 'darwin'",
     # "torchaudio>=2.6.0; sys_platform == 'darwin'",
@@ -36,18 +36,24 @@ dependencies = [
 ]
 
 
+
 # Optional dependencies ------------------------------------------------------------------------------------------------
 [project.optional-dependencies]
 dev = [
-    "ultralytics",
+    "ultralytics==8.3.169", # 锁定版本是为了确保模型和版本一一对应，避免重复下载模型
     "onnx>=1.12.0,<1.18.0", # ONNX export
     'onnxslim>=0.1.56', 
     'onnxruntime',
 
     "pybind11-stubgen>=2.5.4",
     "mypy>=1.17.0",
-    "opencv-python>=4.8.0"
+    "opencv-python>=4.3.0; platform_machine == 'aarch64' and 'tegra' in platform_release"
 ]
+
+[tool.uv]
+python-preference = "system"
+environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
+# https://docs.astral.sh/uv/reference/settings/#python-preference
 
 [[tool.uv.index]]
 url = "https://mirrors.cloud.tencent.com/pypi/simple/"
@@ -56,12 +62,12 @@ default = true
 # CUDA 构建源（仅限 Linux x86_64）
 [[tool.uv.index]]
 name = "pytorch-cuda"
-url = "https://download.pytorch.org/whl/cu128"
+url = "https://download.pytorch.org/whl/cu124"
 explicit = true
 
 # CPU/MPS 构建源（用于 macOS）
 [[tool.uv.index]]
-name = "pytorch-macos"
+name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
@@ -69,22 +75,16 @@ explicit = true
 [tool.uv.sources]
 torch = [
     { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
-    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
 ]
 torchaudio = [
     { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
-    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
 ]
 torchvision = [
     { index = "pytorch-cuda", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
-    { index = "pytorch-macos", marker = "sys_platform == 'darwin'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
 ]
-
-
-[tool.uv]
-python-preference = "system"
-environments = ["sys_platform == 'darwin'", "sys_platform == 'linux'"]
-# https://docs.astral.sh/uv/reference/settings/#python-preference
 
 
 [tool.uv.pip]

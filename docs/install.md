@@ -89,6 +89,15 @@ export UV_HTTP_TIMEOUT=3600
 uv sync
 ```
 
+## OpenCV 类型提示
+
+`.env` 文件中包含了系统的包路径，这使得 VSCode 的 Python 扩展优先搜索系统内的 cv2 包，而不是虚拟环境中的包，然而系统内的 cv2 包并没有类型提示，因此在开发的时候可以调整系统包路径的优先级如下：
+
+```bash
+PYTHONPATH=/usr/lib/python3.10/dist-packages:${PYTHONPATH} # [!code --]
+PYTHONPATH=${PYTHONPATH}:/usr/lib/python3.10/dist-packages # [!code ++]
+```
+
 ## TensorRT 类型提示
 
 参考 [*Python API autocomplete · Issue #1714 · NVIDIA/TensorRT*](https://github.com/NVIDIA/TensorRT/issues/1714)

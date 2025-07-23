@@ -100,21 +100,34 @@ class TensorRTDetectorV10(ITensorRTDetector):
             is_input = False
             if self.engine.get_tensor_mode(name) == trt.TensorIOMode.INPUT:
                 is_input = True
-            dtype = self.engine.get_tensor_dtype(name)
+            dtype = np.dtype(trt.nptype(self.engine.get_tensor_dtype(name)))
             shape = self.engine.get_tensor_shape(name)
+
+            if is_input and shape[0] < 0:
+                assert self.engine.num_optimization_profiles > 0
+                profile_shape = self.engine.get_tensor_profile_shape(name, 0)
+                assert len(profile_shape) == 3  # min,opt,max
+                # Set the *max* profile as binding shape
+                self.context.set_input_shape(name, profile_shape[2])
+                shape = self.context.get_tensor_shape(name)
+
             if is_input:
                 self.batch_size = shape[0]
-            size = np.dtype(trt.nptype(dtype)).itemsize
+
+            size = dtype.itemsize
             for s in shape:
                 size *= s
             allocation = common.cuda_call(cudart.cudaMalloc(size))
 
+            host_allocation = None if is_input else np.zeros(shape, dtype)
+
             binding = {
                 "index": i,
                 "name": name,
-                "dtype": np.dtype(trt.nptype(dtype)),
+                "dtype": dtype,
                 "shape": shape,  # list(shape),
                 "allocation": allocation,
+                "host_allocation": host_allocation,
             }
 
             self.allocations.append(allocation)
@@ -150,13 +163,17 @@ class TensorRTDetectorV10(ITensorRTDetector):
         Get the specs for the output tensor of the network. Useful to prepare memory allocations.
         :return: Two items, the shape of the output tensor and its (numpy) datatype.
         """
+        # specs = []
+        # for o in self.outputs:
+        #     specs.append((o["shape"], o["dtype"]))
+        # return specs
         return self.outputs[0]["shape"], self.outputs[0]["dtype"]
 
     def infer(self, input: np.ndarray) -> np.ndarray:
         """
-        Execute inference on a batch of images. The images should already be batched and preprocessed, as prepared by
-        the ImageBatcher class. Memory copying to and from the GPU device will be performed here.
-        - param `input`: A numpy array holding the image batch.
+        Execute inference on a batch of images.
+        :param batch: A numpy array holding the image batch.
+        :return A list of outputs as numpy arrays.
         """
         # Prepare the output data
         output = np.zeros(*self.output_spec())

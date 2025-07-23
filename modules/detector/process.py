@@ -6,7 +6,9 @@ import numpy as np
 
 class Process:
     @staticmethod
-    def preprocess(img: cv2.Mat, img_size=(640, 640)) -> np.ndarray:
+    def preprocess(
+        img: cv2.Mat, img_size=(640, 640)
+    ) -> tuple[np.ndarray, float, float]:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         input_t = cv2.resize(img, img_size)
         input_t = input_t.transpose(2, 0, 1)
@@ -18,6 +20,7 @@ class Process:
 
     @staticmethod
     def postprocess(preds: np.ndarray, conf_thres=0.5, iou_thres=0.25) -> np.ndarray:
+        preds = preds.transpose(0, 2, 1)  # (1, 84, 8400) -> (1, 8400, 84)
         nms_pred = non_max_suppression(preds, conf_thres, iou_thres)[
             0
         ]  # cv2.dnn.NMSBoxes ?
@@ -25,7 +28,11 @@ class Process:
 
     @staticmethod
     def mark(
-        img: cv2.Mat, preds: np.ndarray, label_list: List[str], scale_h=1.0, scale_w=1.0
+        img: cv2.Mat,
+        preds: np.ndarray,
+        label_list: List[str],
+        scale_h=1.0,
+        scale_w=1.0,
     ):
         for pred in preds:
             x1 = int(scale_w * pred[0])

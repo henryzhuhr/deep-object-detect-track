@@ -14,11 +14,13 @@
     "clangd.fallbackFlags": [
         "-l/home/zhr/program/openvino/runtime/include"
     ],
-    "python.analysis.autoImportCompletions": true,
-    "python.analysis.extraPaths": [
-        "/opt/intel/openvino_2024/python",
-        "/usr/lib/python3.10/dist-packages",// for jetpack
-        "./stubs", // trt 类型提示
-    ],
-   "python.analysis.typeCheckingMode": "basic"
+//     "python.analysis.autoImportCompletions": true,
+//     "python.analysis.extraPaths": [
+//         // "/opt/intel/openvino_2024/python",
+//         // "/usr/lib/python3.10/dist-packages",// for jetpack
+//         // ".venv/lib/python3.10/site-packages/cv2", // cv2 类型提示
+//         ".venv/lib/python3.11/site-packages/cv2", // cv2 类型提示
+//         "./stubs", // trt 类型提示
+//     ],
+//    "python.analysis.typeCheckingMode": "basic"
 }

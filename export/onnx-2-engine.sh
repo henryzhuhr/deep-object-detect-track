@@ -2,7 +2,7 @@
 
 source ".env"
 
-model="yolo11n"
+model="yolo11s"
 
 if [ -z "$YOLO_MODEL_DIR" ]; then
     echo "Error: YOLO_MODEL_DIR is not set in .env file."
