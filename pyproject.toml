@@ -90,7 +90,3 @@ torchvision = [
 [tool.uv.pip]
 torch-backend = "auto"
 
-[tool.mypy]
-follow_imports = "silent"
-show_error_codes = true
-stub_dirs = ["stubs"]

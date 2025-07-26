@@ -26,7 +26,8 @@ for model in "${model_list[@]}"; do
         --onnx="${YOLO_MODEL_DIR}/${model}.onnx" \
         --saveEngine="${YOLO_MODEL_DIR}/${model}.engine" \
         --best \
-        --stronglyTyped \
-        --verbose
+        --stronglyTyped
+        # --verbose
 done
 
+ 

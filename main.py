@@ -21,7 +21,7 @@ label_list = [
 
 def main() -> None:
     detector = TensorRTDetectorV10()
-    detector.load_model("~/.cache/ultralytics/yolo11n.engine", verbose=True)
+    detector.load_model("~/.cache/ultralytics/yolo11s.engine", verbose=True)
 
     label_map: Dict[int, str] = {}
     with open("data/coco.yaml", "r") as f:
