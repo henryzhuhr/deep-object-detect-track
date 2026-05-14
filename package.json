@@ -25,14 +25,25 @@
   "private": true,
   "license": "Apache-2.0",
   "bugs": "https://github.com/henryzhuhr/deep-object-detect-track/issues",
+  "pnpm": {
+    "overrides": {
+      "@xmldom/xmldom": "0.9.10",
+      "esbuild": "0.25.0",
+      "immutable": "5.1.5",
+      "mdast-util-to-hast": "13.2.1",
+      "picomatch": "2.3.2",
+      "postcss": "8.5.10",
+      "preact": "10.29.1",
+      "rollup": "4.60.3",
+      "vite": "6.4.2"
+    }
+  },
   "devDependencies": {
-    "@mdit-vue/shared": "^2.1.4",
     "markdown-it-mathjax3": "^4.3.2",
     "medium-zoom": "^1.1.0",
-    "sass": "^1.89.2",
     "transliteration": "^2.3.5",
     "uslug": "^1.0.4",
-    "vitepress": "^1.6.3",
+    "vitepress": "^1.6.4",
     "vue": "^3.5.17"
   }
 }
